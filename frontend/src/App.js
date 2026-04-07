@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { MobileContainer } from './components/layout/MobileContainer';
 import { BottomNavigation } from './components/layout/BottomNavigation';
 import { FloatingVoiceButton } from './components/voice/FloatingVoiceButton';
 import { VoiceOverlay } from './components/voice/VoiceOverlay';
@@ -17,7 +16,7 @@ import { AgentHome } from './pages/AgentHome';
 import { DiseaseAnalysis } from './pages/DiseaseAnalysis';
 import { WeatherAdvisory } from './pages/WeatherAdvisory';
 import { Reminders } from './pages/Reminders';
-import { MarketConnect } from './pages/MarketConnect';
+import { FarmHistory } from './pages/FarmHistory';
 import { Profile } from './pages/Profile';
 
 import './index.css';
@@ -48,37 +47,38 @@ function AppLayout() {
 
   const handleVoiceResult = (result) => {
     console.log('Voice result:', result);
-    // Could navigate based on result, show toast, etc.
   };
 
   return (
-    <MobileContainer>
-      <Routes>
-        <Route 
-          path="/" 
-          element={<AgentHome onVoiceOpen={() => setVoiceOpen(true)} />} 
-        />
-        <Route 
-          path="/disease" 
-          element={<DiseaseAnalysis />} 
-        />
-        <Route 
-          path="/weather" 
-          element={<WeatherAdvisory />} 
-        />
-        <Route 
-          path="/reminders" 
-          element={<Reminders onVoiceOpen={() => setVoiceOpen(true)} />} 
-        />
-        <Route 
-          path="/market" 
-          element={<MarketConnect onVoiceOpen={() => setVoiceOpen(true)} />} 
-        />
-        <Route 
-          path="/profile" 
-          element={<Profile />} 
-        />
-      </Routes>
+    <div className="min-h-screen bg-[#F7F9F4]">
+      <div className="max-w-2xl mx-auto min-h-screen flex flex-col pb-20">
+        <Routes>
+          <Route 
+            path="/" 
+            element={<AgentHome onVoiceOpen={() => setVoiceOpen(true)} />} 
+          />
+          <Route 
+            path="/disease" 
+            element={<DiseaseAnalysis />} 
+          />
+          <Route 
+            path="/weather" 
+            element={<WeatherAdvisory />} 
+          />
+          <Route 
+            path="/reminders" 
+            element={<Reminders onVoiceOpen={() => setVoiceOpen(true)} />} 
+          />
+          <Route 
+            path="/history" 
+            element={<FarmHistory />} 
+          />
+          <Route 
+            path="/profile" 
+            element={<Profile />} 
+          />
+        </Routes>
+      </div>
       
       <BottomNavigation />
       <FloatingVoiceButton onClick={() => setVoiceOpen(true)} />
@@ -87,14 +87,14 @@ function AppLayout() {
         onClose={() => setVoiceOpen(false)}
         onResult={handleVoiceResult}
       />
-    </MobileContainer>
+    </div>
   );
 }
 
 // Main App Router
 function AppRouter() {
   const { onboardingComplete } = useApp();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>

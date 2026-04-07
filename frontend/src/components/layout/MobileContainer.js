@@ -1,9 +1,9 @@
 import React from 'react';
 
-export function MobileContainer({ children, className = '', noPadding = false }) {
+export function MobileContainer({ children, className = '' }) {
   return (
-    <div className={`mobile-container ${className}`}>
-      <div className={`flex flex-col min-h-screen min-h-[100dvh] ${noPadding ? '' : 'pb-28'}`}>
+    <div className={`min-h-screen bg-[#F7F9F4] ${className}`}>
+      <div className="max-w-2xl mx-auto min-h-screen">
         {children}
       </div>
     </div>

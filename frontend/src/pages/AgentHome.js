@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mic, Leaf, CloudSun, Calendar, ShoppingBag, Bell, Lightbulb, ChevronRight } from 'lucide-react';
+import { Mic, Leaf, CloudSun, Calendar, History, Bell, Lightbulb, ChevronRight, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,7 +11,7 @@ const quickActions = [
   { icon: Leaf, labelKey: 'check_disease', path: '/app/disease', color: 'bg-emerald-500' },
   { icon: CloudSun, labelKey: 'weather_advice', path: '/app/weather', color: 'bg-blue-500' },
   { icon: Calendar, labelKey: 'set_reminder', path: '/app/reminders', color: 'bg-amber-500' },
-  { icon: ShoppingBag, labelKey: 'sell_produce', path: '/app/market', color: 'bg-purple-500' },
+  { icon: History, labelKey: 'view_history', path: '/app/history', color: 'bg-purple-500' },
 ];
 
 export function AgentHome({ onVoiceOpen }) {
@@ -20,37 +20,36 @@ export function AgentHome({ onVoiceOpen }) {
   const { user } = useAuth();
   
   const [alerts, setAlerts] = useState([]);
+  const [nextReminder, setNextReminder] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAlerts();
+    fetchData();
   }, []);
 
-  const fetchAlerts = async () => {
+  const fetchData = async () => {
     try {
       const storedToken = localStorage.getItem('krishi_token');
       const headers = storedToken ? { Authorization: `Bearer ${storedToken}` } : {};
       
-      const response = await axios.get(`${API_URL}/api/alerts`, {
-        withCredentials: true,
-        headers
-      });
-      setAlerts(response.data);
-    } catch (err) {
-      // Set default alerts on error
-      setAlerts([
-        {
-          id: 'default_tip',
-          type: 'info',
-          title: language === 'hi' ? 'खेती टिप' : language === 'mr' ? 'शेती टिप' : 'Farming Tip',
-          message: language === 'hi' 
-            ? 'सुबह 5-8 बजे सिंचाई का सबसे अच्छा समय है।'
-            : language === 'mr'
-            ? 'सकाळी 5-8 वाजता पाणी देणे उत्तम.'
-            : 'Best irrigation time is early morning (5-8 AM).',
-          category: 'tip'
-        }
+      // Fetch alerts and reminders in parallel
+      const [alertsRes, remindersRes] = await Promise.all([
+        axios.get(`${API_URL}/api/alerts`, { withCredentials: true, headers }).catch(() => ({ data: [] })),
+        axios.get(`${API_URL}/api/reminders`, { withCredentials: true, headers }).catch(() => ({ data: [] }))
       ]);
+      
+      setAlerts(alertsRes.data || []);
+      
+      // Find next upcoming reminder
+      const upcomingReminders = (remindersRes.data || [])
+        .filter(r => !r.completed && new Date(r.reminder_time) > new Date())
+        .sort((a, b) => new Date(a.reminder_time) - new Date(b.reminder_time));
+      
+      if (upcomingReminders.length > 0) {
+        setNextReminder(upcomingReminders[0]);
+      }
+    } catch (err) {
+      console.error('Fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -70,52 +69,95 @@ export function AgentHome({ onVoiceOpen }) {
     return language === 'hi' ? 'शुभ संध्या' : language === 'mr' ? 'शुभ संध्याकाळ' : 'Good Evening';
   };
 
+  const formatReminderTime = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const timeStr = date.toLocaleTimeString(language === 'hi' ? 'hi-IN' : language === 'mr' ? 'mr-IN' : 'en-IN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    if (date.toDateString() === today.toDateString()) {
+      return `${language === 'hi' ? 'आज' : language === 'mr' ? 'आज' : 'Today'} ${timeStr}`;
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return `${language === 'hi' ? 'कल' : language === 'mr' ? 'उद्या' : 'Tomorrow'} ${timeStr}`;
+    }
+    
+    return date.toLocaleDateString(language === 'hi' ? 'hi-IN' : language === 'mr' ? 'mr-IN' : 'en-IN', {
+      day: 'numeric',
+      month: 'short'
+    }) + ' ' + timeStr;
+  };
+
   return (
     <div 
-      className="flex-1 px-4 pt-6 pb-4 overflow-y-auto hide-scrollbar"
+      className="flex-1 px-4 pt-6 pb-4 overflow-y-auto"
       data-testid="agent-home-screen"
     >
       {/* Greeting Section */}
       <div className="mb-6 page-enter">
         <p className="text-[#5C7364] text-sm font-medium">{getGreetingTime()}</p>
         <h1 className="text-2xl font-bold text-[#1F2924] font-['Outfit']">
-          {t('greeting')}, {getUserName()}! 👋
+          {t('greeting')}, {getUserName()}!
         </h1>
-        <p className="text-[#5C7364] mt-1">{t('how_can_help')}</p>
+        <p className="text-[#5C7364] mt-1 text-sm">{t('how_can_help')}</p>
       </div>
 
       {/* Voice Assistant Card */}
       <button
         onClick={onVoiceOpen}
         data-testid="voice-assistant-card"
-        className="w-full bg-gradient-to-br from-[#2F6944] to-[#51A870] rounded-2xl p-6 mb-6 text-left relative overflow-hidden shadow-[0_8px_32px_rgba(47,105,68,0.25)] hover:shadow-[0_12px_40px_rgba(47,105,68,0.3)] transition-all active:scale-[0.98]"
+        className="w-full bg-gradient-to-br from-[#2F6944] to-[#51A870] rounded-2xl p-5 mb-6 text-left relative overflow-hidden shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
       >
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
         
         <div className="relative z-10 flex items-center gap-4">
           {/* Voice orb */}
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-              <Mic className="w-7 h-7 text-white" />
+            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+              <Mic className="w-6 h-6 text-white" />
             </div>
             {/* Pulse effect */}
             <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" />
           </div>
           
           <div className="flex-1">
-            <h2 className="text-white font-semibold text-lg">{t('app_name')}</h2>
+            <h2 className="text-white font-semibold text-lg">{t('voice_assistant')}</h2>
             <p className="text-white/80 text-sm">{t('tap_to_speak')}</p>
           </div>
           
-          <ChevronRight className="text-white/60" size={24} />
+          <ChevronRight className="text-white/60" size={22} />
         </div>
       </button>
 
+      {/* Next Reminder Card */}
+      {nextReminder && (
+        <div 
+          className="card mb-6 border-l-4 border-l-amber-500 bg-gradient-to-r from-amber-50/50 to-transparent cursor-pointer hover:shadow-md transition-all"
+          onClick={() => navigate('/app/reminders')}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+              <Clock size={20} className="text-amber-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-amber-600 font-medium mb-0.5">{t('next_reminder')}</p>
+              <p className="text-[#1F2924] font-medium truncate">{nextReminder.title}</p>
+              <p className="text-[#5C7364] text-xs">{formatReminderTime(nextReminder.reminder_time)}</p>
+            </div>
+            <ChevronRight size={18} className="text-[#5C7364]" />
+          </div>
+        </div>
+      )}
+
       {/* Quick Actions */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-[#1F2924] mb-3 font-['Outfit']">
+        <h3 className="text-base font-semibold text-[#1F2924] mb-3 font-['Outfit']">
           {t('quick_actions')}
         </h3>
         <div className="grid grid-cols-2 gap-3">
@@ -126,8 +168,7 @@ export function AgentHome({ onVoiceOpen }) {
                 key={action.labelKey}
                 onClick={() => navigate(action.path)}
                 data-testid={`quick-action-${action.labelKey}`}
-                className="card flex items-center gap-3 hover:shadow-[0_8px_32px_rgba(47,105,68,0.1)] transition-all active:scale-[0.98] stagger-item"
-                style={{ animationDelay: `${index * 0.05}s` }}
+                className="bg-white rounded-xl p-4 flex items-center gap-3 border border-[#E4EBE5] hover:border-[#2F6944]/30 hover:shadow-md transition-all active:scale-[0.98]"
               >
                 <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center text-white`}>
                   <Icon size={20} />
@@ -142,65 +183,54 @@ export function AgentHome({ onVoiceOpen }) {
       </div>
 
       {/* Recent Alerts */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-[#1F2924] mb-3 font-['Outfit'] flex items-center gap-2">
-          <Bell size={18} className="text-[#2F6944]" />
-          {t('recent_alerts')}
-        </h3>
-        
-        {loading ? (
-          <div className="card animate-pulse">
-            <div className="h-4 bg-[#E4EBE5] rounded w-3/4 mb-2" />
-            <div className="h-3 bg-[#E4EBE5] rounded w-full" />
-          </div>
-        ) : alerts.length > 0 ? (
+      {alerts.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-base font-semibold text-[#1F2924] mb-3 font-['Outfit'] flex items-center gap-2">
+            <Bell size={16} className="text-[#2F6944]" />
+            {t('recent_alerts')}
+          </h3>
+          
           <div className="space-y-2">
-            {alerts.slice(0, 3).map((alert, index) => (
+            {alerts.slice(0, 2).map((alert, index) => (
               <div 
                 key={alert.id}
-                className={`card border-l-4 stagger-item ${
+                className={`bg-white rounded-xl p-4 border border-[#E4EBE5] ${
                   alert.type === 'warning' 
-                    ? 'border-l-amber-500 bg-amber-50/50' 
-                    : 'border-l-[#2F6944] bg-[#2F6944]/5'
+                    ? 'border-l-4 border-l-amber-500' 
+                    : 'border-l-4 border-l-[#2F6944]'
                 }`}
-                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-start gap-3">
                   {alert.type === 'warning' ? (
-                    <Bell size={18} className="text-amber-500 mt-0.5" />
+                    <Bell size={16} className="text-amber-500 mt-0.5 flex-shrink-0" />
                   ) : (
-                    <Lightbulb size={18} className="text-[#2F6944] mt-0.5" />
+                    <Lightbulb size={16} className="text-[#2F6944] mt-0.5 flex-shrink-0" />
                   )}
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium text-[#1F2924] text-sm">{alert.title}</p>
-                    <p className="text-[#5C7364] text-xs mt-0.5">{alert.message}</p>
+                    <p className="text-[#5C7364] text-xs mt-0.5 line-clamp-2">{alert.message}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="card text-center py-6">
-            <Bell size={24} className="mx-auto text-[#5C7364] mb-2" />
-            <p className="text-[#5C7364] text-sm">No alerts at the moment</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Today's Tips */}
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-[#1F2924] mb-3 font-['Outfit'] flex items-center gap-2">
-          <Lightbulb size={18} className="text-amber-500" />
+        <h3 className="text-base font-semibold text-[#1F2924] mb-3 font-['Outfit'] flex items-center gap-2">
+          <Lightbulb size={16} className="text-amber-500" />
           {t('todays_tips')}
         </h3>
         
-        <div className="card bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100">
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
           <p className="text-[#1F2924] text-sm leading-relaxed">
             {language === 'hi' 
-              ? '💡 अपने पौधों को सुबह जल्दी या शाम को पानी दें। यह पानी के नुकसान को कम करता है और पौधों को बेहतर तरीके से पानी मिलता है।'
+              ? 'अपने पौधों को सुबह जल्दी या शाम को पानी दें। यह पानी के नुकसान को कम करता है और पौधों को बेहतर तरीके से पानी मिलता है।'
               : language === 'mr'
-              ? '💡 तुमच्या रोपांना सकाळी लवकर किंवा संध्याकाळी पाणी द्या. यामुळे पाण्याचे बाष्पीभवन कमी होते.'
-              : '💡 Water your plants early morning or evening. This reduces water loss through evaporation and ensures better absorption by plants.'}
+              ? 'तुमच्या रोपांना सकाळी लवकर किंवा संध्याकाळी पाणी द्या. यामुळे पाण्याचे बाष्पीभवन कमी होते.'
+              : 'Water your plants early morning or evening. This reduces water loss through evaporation and ensures better absorption by plants.'}
           </p>
         </div>
       </div>

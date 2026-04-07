@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AppContext = createContext(null);
 
-// Translation dictionary
+// Translation dictionary - Updated with History instead of Market
 const translations = {
   en: {
     // Common
@@ -17,18 +17,19 @@ const translations = {
     loading: "Loading...",
     error: "Error",
     success: "Success",
+    send: "Send",
     
-    // Navigation
-    nav_agent: "Agent",
+    // Navigation - Updated
+    nav_agent: "Home",
     nav_disease: "Disease",
     nav_weather: "Weather",
     nav_reminders: "Reminders",
-    nav_market: "Market",
+    nav_history: "History",
     nav_profile: "Profile",
     
     // Splash
     splash_subtitle: "Voice-first AI Assistant for Indian Farmers",
-    splash_description: "Get farming advice, check crop health, and connect with markets - all through voice",
+    splash_description: "Get farming advice, check crop health, set reminders - all through voice",
     get_started: "Get Started",
     
     // Language Selection
@@ -71,9 +72,11 @@ const translations = {
     check_disease: "Check Crop Disease",
     weather_advice: "Weather Advice",
     set_reminder: "Set Reminder",
-    sell_produce: "Sell Produce",
+    view_history: "View History",
     recent_alerts: "Recent Alerts",
     todays_tips: "Today's Tips",
+    next_reminder: "Next Reminder",
+    recent_activity: "Recent Activity",
     
     // Disease
     disease_title: "Crop Disease Analysis",
@@ -114,18 +117,18 @@ const translations = {
     high: "High",
     medium: "Medium",
     low: "Low",
+    reminder_due: "Reminder Due!",
+    reminder_alert: "It's time for your reminder",
     
-    // Market
-    market_title: "Market Connect",
-    sell_your_produce: "Sell Your Produce",
-    create_listing: "Create Listing",
-    active_listings: "Active Listings",
-    crop_name: "Crop Name",
-    quantity: "Quantity",
-    expected_price: "Expected Price",
-    nearby_buyers: "Nearby Buyers",
-    market_trends: "Market Trends",
-    no_listings: "No active listings",
+    // History
+    history_title: "Farm History",
+    history_subtitle: "Your farming activity log",
+    all_activities: "All Activities",
+    disease_checks: "Disease Checks",
+    weather_views: "Weather Views",
+    reminders_history: "Reminders",
+    no_history: "No activity recorded yet",
+    activity_type: "Activity",
     
     // Profile
     profile_title: "My Profile",
@@ -133,13 +136,22 @@ const translations = {
     language_preference: "Language",
     logout: "Logout",
     app_settings: "Settings",
+    total_reminders: "Reminders",
+    total_scans: "Disease Scans",
     
     // Voice
     listening: "Listening...",
-    speak_now: "Speak now",
+    speak_now: "Tap the mic and speak",
     processing: "Processing...",
     voice_not_supported: "Voice not supported in this browser",
     type_message: "Type your message...",
+    voice_assistant: "Voice Assistant",
+    try_saying: "Try saying:",
+    voice_examples: [
+      "Check crop disease",
+      "What's the weather like?",
+      "Remind me to water plants at 5 PM"
+    ],
   },
   hi: {
     // Common
@@ -154,18 +166,19 @@ const translations = {
     loading: "लोड हो रहा है...",
     error: "त्रुटि",
     success: "सफल",
+    send: "भेजें",
     
-    // Navigation
-    nav_agent: "एजेंट",
+    // Navigation - Updated
+    nav_agent: "होम",
     nav_disease: "रोग",
     nav_weather: "मौसम",
     nav_reminders: "रिमाइंडर",
-    nav_market: "मार्केट",
+    nav_history: "रिकॉर्ड",
     nav_profile: "प्रोफाइल",
     
     // Splash
     splash_subtitle: "भारतीय किसानों के लिए वॉइस-फर्स्ट AI सहायक",
-    splash_description: "खेती सलाह प्राप्त करें, फसल स्वास्थ्य जांचें, और बाजारों से जुड़ें - सब कुछ आवाज से",
+    splash_description: "खेती सलाह प्राप्त करें, फसल स्वास्थ्य जांचें, रिमाइंडर सेट करें - सब कुछ आवाज से",
     get_started: "शुरू करें",
     
     // Language Selection
@@ -208,9 +221,11 @@ const translations = {
     check_disease: "फसल रोग जांचें",
     weather_advice: "मौसम सलाह",
     set_reminder: "रिमाइंडर सेट करें",
-    sell_produce: "उपज बेचें",
+    view_history: "रिकॉर्ड देखें",
     recent_alerts: "हाल के अलर्ट",
     todays_tips: "आज की टिप्स",
+    next_reminder: "अगला रिमाइंडर",
+    recent_activity: "हाल की गतिविधि",
     
     // Disease
     disease_title: "फसल रोग विश्लेषण",
@@ -251,18 +266,18 @@ const translations = {
     high: "उच्च",
     medium: "मध्यम",
     low: "निम्न",
+    reminder_due: "रिमाइंडर का समय!",
+    reminder_alert: "आपके रिमाइंडर का समय आ गया है",
     
-    // Market
-    market_title: "मार्केट कनेक्ट",
-    sell_your_produce: "अपनी उपज बेचें",
-    create_listing: "लिस्टिंग बनाएं",
-    active_listings: "सक्रिय लिस्टिंग",
-    crop_name: "फसल का नाम",
-    quantity: "मात्रा",
-    expected_price: "अपेक्षित कीमत",
-    nearby_buyers: "आसपास के खरीदार",
-    market_trends: "बाजार रुझान",
-    no_listings: "कोई सक्रिय लिस्टिंग नहीं",
+    // History
+    history_title: "किसान रिकॉर्ड",
+    history_subtitle: "आपकी खेती गतिविधि लॉग",
+    all_activities: "सभी गतिविधियां",
+    disease_checks: "रोग जांच",
+    weather_views: "मौसम देखें",
+    reminders_history: "रिमाइंडर",
+    no_history: "अभी तक कोई गतिविधि दर्ज नहीं",
+    activity_type: "गतिविधि",
     
     // Profile
     profile_title: "मेरी प्रोफाइल",
@@ -270,13 +285,22 @@ const translations = {
     language_preference: "भाषा",
     logout: "लॉगआउट",
     app_settings: "सेटिंग्स",
+    total_reminders: "रिमाइंडर",
+    total_scans: "रोग जांच",
     
     // Voice
     listening: "सुन रहा हूं...",
-    speak_now: "अभी बोलें",
+    speak_now: "माइक टैप करें और बोलें",
     processing: "प्रोसेसिंग...",
     voice_not_supported: "इस ब्राउज़र में आवाज़ समर्थित नहीं है",
     type_message: "अपना संदेश टाइप करें...",
+    voice_assistant: "वॉइस सहायक",
+    try_saying: "यह बोलकर देखें:",
+    voice_examples: [
+      "फसल रोग जांचें",
+      "मौसम कैसा है?",
+      "5 बजे पौधों को पानी देने का याद दिलाना"
+    ],
   },
   mr: {
     // Common
@@ -291,18 +315,19 @@ const translations = {
     loading: "लोड होत आहे...",
     error: "त्रुटी",
     success: "यशस्वी",
+    send: "पाठवा",
     
-    // Navigation
-    nav_agent: "एजंट",
+    // Navigation - Updated
+    nav_agent: "होम",
     nav_disease: "रोग",
     nav_weather: "हवामान",
     nav_reminders: "स्मरणपत्रे",
-    nav_market: "बाजार",
+    nav_history: "नोंदी",
     nav_profile: "प्रोफाइल",
     
     // Splash
     splash_subtitle: "भारतीय शेतकऱ्यांसाठी व्हॉइस-फर्स्ट AI सहाय्यक",
-    splash_description: "शेती सल्ला मिळवा, पीक आरोग्य तपासा, आणि बाजारपेठांशी जोडा - सर्व आवाजाने",
+    splash_description: "शेती सल्ला मिळवा, पीक आरोग्य तपासा, स्मरणपत्रे सेट करा - सर्व आवाजाने",
     get_started: "सुरू करा",
     
     // Language Selection
@@ -345,9 +370,11 @@ const translations = {
     check_disease: "पीक रोग तपासा",
     weather_advice: "हवामान सल्ला",
     set_reminder: "स्मरणपत्र सेट करा",
-    sell_produce: "उत्पादन विका",
+    view_history: "नोंदी पहा",
     recent_alerts: "अलीकडील अलर्ट",
     todays_tips: "आजच्या टिप्स",
+    next_reminder: "पुढील स्मरणपत्र",
+    recent_activity: "अलीकडील क्रियाकलाप",
     
     // Disease
     disease_title: "पीक रोग विश्लेषण",
@@ -388,18 +415,18 @@ const translations = {
     high: "उच्च",
     medium: "मध्यम",
     low: "निम्न",
+    reminder_due: "स्मरणपत्राची वेळ!",
+    reminder_alert: "तुमच्या स्मरणपत्राची वेळ आली आहे",
     
-    // Market
-    market_title: "मार्केट कनेक्ट",
-    sell_your_produce: "तुमचे उत्पादन विका",
-    create_listing: "यादी तयार करा",
-    active_listings: "सक्रिय याद्या",
-    crop_name: "पिकाचे नाव",
-    quantity: "प्रमाण",
-    expected_price: "अपेक्षित किंमत",
-    nearby_buyers: "जवळचे खरेदीदार",
-    market_trends: "बाजार ट्रेंड",
-    no_listings: "सक्रिय याद्या नाहीत",
+    // History
+    history_title: "शेत नोंदी",
+    history_subtitle: "तुमची शेती क्रियाकलाप लॉग",
+    all_activities: "सर्व क्रियाकलाप",
+    disease_checks: "रोग तपासणी",
+    weather_views: "हवामान पाहिले",
+    reminders_history: "स्मरणपत्रे",
+    no_history: "अद्याप कोणताही क्रियाकलाप नोंदवला नाही",
+    activity_type: "क्रियाकलाप",
     
     // Profile
     profile_title: "माझी प्रोफाइल",
@@ -407,13 +434,22 @@ const translations = {
     language_preference: "भाषा",
     logout: "लॉगआउट",
     app_settings: "सेटिंग्ज",
+    total_reminders: "स्मरणपत्रे",
+    total_scans: "रोग तपासणी",
     
     // Voice
     listening: "ऐकत आहे...",
-    speak_now: "आता बोला",
+    speak_now: "माइक टॅप करा आणि बोला",
     processing: "प्रक्रिया होत आहे...",
     voice_not_supported: "या ब्राउझरमध्ये आवाज समर्थित नाही",
     type_message: "तुमचा संदेश टाइप करा...",
+    voice_assistant: "व्हॉइस सहाय्यक",
+    try_saying: "हे बोलून पहा:",
+    voice_examples: [
+      "पीक रोग तपासा",
+      "हवामान कसे आहे?",
+      "5 वाजता झाडांना पाणी द्यायची आठवण करा"
+    ],
   }
 };
 
@@ -429,11 +465,20 @@ export function AppProvider({ children }) {
   const [isVoiceListening, setIsVoiceListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
   const [voiceSupported, setVoiceSupported] = useState(false);
+  const [activeReminders, setActiveReminders] = useState([]);
+  const [reminderAlert, setReminderAlert] = useState(null);
 
   // Check voice support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     setVoiceSupported(!!SpeechRecognition);
+  }, []);
+
+  // Request notification permission
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
   }, []);
 
   const setLanguage = useCallback((lang) => {
@@ -478,6 +523,38 @@ export function AppProvider({ children }) {
     }
   }, []);
 
+  // Show reminder alert
+  const showReminderAlert = useCallback((reminder) => {
+    setReminderAlert(reminder);
+    
+    // Try browser notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(t('reminder_due'), {
+        body: reminder.title,
+        icon: '/favicon.ico',
+        tag: reminder.id
+      });
+    }
+    
+    // Play sound
+    try {
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleDoAAABQpOT/lEAAAgAAAABAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==');
+      audio.play().catch(() => {});
+    } catch (e) {}
+    
+    // Speak the reminder
+    speak(`${t('reminder_alert')}: ${reminder.title}`);
+    
+    // Auto dismiss after 10 seconds
+    setTimeout(() => {
+      setReminderAlert(null);
+    }, 10000);
+  }, [speak, t]);
+
+  const dismissReminderAlert = useCallback(() => {
+    setReminderAlert(null);
+  }, []);
+
   const value = {
     language,
     setLanguage,
@@ -492,6 +569,11 @@ export function AppProvider({ children }) {
     voiceSupported,
     speak,
     stopSpeaking,
+    activeReminders,
+    setActiveReminders,
+    reminderAlert,
+    showReminderAlert,
+    dismissReminderAlert,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
