@@ -498,6 +498,11 @@ def get_mock_weather():
         "is_mock": True
     }
 
+# Health check endpoint
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy", "app": "Krishi Voice Agent"}
+
 # =====================
 # AI CHAT ROUTES
 # =====================
@@ -914,8 +919,3 @@ app.add_middleware(
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
-
-# Root endpoint
-@api_router.get("/health")
-async def health_check():
-    return {"status": "healthy", "app": "Krishi Voice Agent"}

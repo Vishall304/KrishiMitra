@@ -218,14 +218,14 @@ export function WeatherAdvisory() {
       </div>
 
       {/* Current Weather Card */}
-      <div className="card bg-gradient-to-br from-[#2F6944] to-[#51A870] text-white mb-6" data-testid="current-weather-card">
+      <div className="rounded-2xl bg-gradient-to-br from-[#2F6944] to-[#51A870] text-white mb-6 p-6" data-testid="current-weather-card">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-white/80 mb-1">{t('current_weather')}</p>
-            <div className="text-5xl font-bold font-['Outfit']">
-              {weather?.current?.temperature}°C
+            <p className="text-white/80 text-sm mb-2">{t('current_weather')}</p>
+            <div className="text-5xl font-bold font-['Outfit'] text-white drop-shadow-md">
+              {Math.round(weather?.current?.temperature || 0)}°C
             </div>
-            <p className="text-white/90 mt-2 font-medium">{weatherInfo.label}</p>
+            <p className="text-white/90 mt-3 font-medium text-lg">{weatherInfo.label}</p>
           </div>
           <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
             <WeatherIcon size={40} className="text-white" />
