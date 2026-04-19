@@ -1,0 +1,25 @@
+/* Krishi Voice Agent - Premium Green Agri-tech Theme */
+
+/* Base Resets */
+.App {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Override any default dark backgrounds */
+.App-header {
+  background-color: #F7F9F4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #1F2924;
+}
+
+/* Ensure all backgrounds use theme colors */
+body {
+  background-color: #F7F9F4;
+}
+
+/* Animation keyframes are in index.css */

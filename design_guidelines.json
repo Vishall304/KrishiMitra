@@ -1,0 +1,115 @@
+{
+  "theme": "Light",
+  "archetype": "1 (Organic & Earthy)",
+  "typography": {
+    "headings": "Outfit, sans-serif",
+    "body": "Manrope, sans-serif",
+    "font_weights": {
+      "headings": "font-semibold to font-bold",
+      "body": "font-normal to font-medium"
+    },
+    "font_imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');"
+    ]
+  },
+  "colors": {
+    "background": "#F7F9F4",
+    "surface": "#FFFFFF",
+    "primary": "#2F6944",
+    "primary_hover": "#224A30",
+    "accent": "#51A870",
+    "text_primary": "#1F2924",
+    "text_secondary": "#5C7364",
+    "border": "#E4EBE5",
+    "success": "#34A853",
+    "warning": "#F59E0B",
+    "error": "#EF4444"
+  },
+  "spacing_and_layout": {
+    "global_padding": "p-4 sm:p-6",
+    "border_radius": {
+      "card": "rounded-2xl",
+      "button": "rounded-xl",
+      "input": "rounded-xl"
+    },
+    "shadows": {
+      "card": "shadow-[0_4px_24px_rgba(47,105,68,0.05)]",
+      "floating": "shadow-[0_8px_32px_rgba(47,105,68,0.15)]"
+    },
+    "app_container": "mobile-first approach, min-h-screen bg-[#F7F9F4] w-full max-w-md mx-auto relative overflow-hidden flex flex-col shadow-2xl bg-white"
+  },
+  "components": {
+    "bottom_navigation": {
+      "style": "fixed bottom-0 w-full max-w-md bg-white/90 backdrop-blur-xl border-t border-[#E4EBE5] flex justify-around items-center h-20 px-2 pb-safe z-40 left-1/2 -translate-x-1/2",
+      "items": "Agent (Home), Disease, Weather, Reminders, Market, Profile",
+      "active_state": "text-[#2F6944] font-medium",
+      "inactive_state": "text-[#5C7364]"
+    },
+    "floating_voice_button": {
+      "style": "absolute bottom-[96px] right-4 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-tr from-[#2F6944] to-[#51A870] flex items-center justify-center text-white shadow-[0_8px_32px_rgba(81,168,112,0.4)] z-50",
+      "animation": "Add an absolute pulsing ring behind the button using animate-ping and bg-[#51A870]/30"
+    },
+    "cards": {
+      "style": "bg-white rounded-2xl p-5 shadow-[0_4px_24px_rgba(47,105,68,0.05)] border border-[#E4EBE5]"
+    },
+    "buttons": {
+      "primary": "w-full bg-[#2F6944] text-white h-14 rounded-xl font-semibold text-lg hover:bg-[#224A30] transition-colors shadow-sm",
+      "secondary": "w-full bg-white text-[#2F6944] h-14 rounded-xl font-semibold text-lg border-2 border-[#E4EBE5] hover:border-[#2F6944] transition-colors",
+      "voice_option": "flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-white border-2 border-[#E4EBE5] hover:border-[#2F6944] hover:bg-[#F7F9F4] transition-all cursor-pointer"
+    },
+    "inputs": {
+      "style": "w-full h-14 bg-white border border-[#E4EBE5] rounded-xl px-4 text-[#1F2924] focus:ring-2 focus:ring-[#51A870] focus:border-transparent outline-none transition-all placeholder:text-[#5C7364]/60"
+    }
+  },
+  "screens": {
+    "Splash": "Full screen bg-[#2F6944] or green gradient, app logo centered, subtle leaf patterns. Image: background blur of sunrise.",
+    "Language_Selection": "Large, tappable cards for each language (Hindi, Marathi, English) with voice icons. 'Tap or Say your language' prompt.",
+    "Login_Signup": "Phone number based login, large inputs, big Send OTP button.",
+    "Profile_Setup": "Name, Crop Types, Location. Uses Shadcn Form elements customized.",
+    "Agent_Home": "Greeting top bar (Hi, Ram!), Quick actions grid (Weather today, Check crops), large central 'Tap to speak' pulsing orb or voice activity visualizer.",
+    "Disease_Analysis": "Camera/Upload area (large dotted box), Image preview, AI Result card with diagnosis and treatment.",
+    "Weather_Advisory": "Large weather card, hourly forecast, farming advice based on weather (e.g. 'Good time to spray pesticides').",
+    "Reminders": "List of upcoming tasks. 'Add via voice' button.",
+    "Market_Connect": "Grid of produce, prices, 'Create Listing' button.",
+    "Profile": "Farmer details, language preference, logout."
+  },
+  "animations": {
+    "transitions": "framer-motion for page transitions (slide up/fade in).",
+    "voice_active": "multi-ring pulsing using CSS animations to simulate listening/speaking state.",
+    "staggered_lists": "Lists in Reminders or Market should animate in one by one."
+  },
+  "media": {
+    "images": {
+      "splash_bg": {
+        "url": "https://images.pexels.com/photos/9542614/pexels-photo-9542614.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "A tranquil sunrise over a misty field in rural Punjab, India",
+        "category": "background"
+      },
+      "disease_placeholder": {
+        "url": "https://images.unsplash.com/photo-1555070959-29a7eed0a257?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxjcm9wJTIwbGVhZiUyMHdpdGglMjBtb3JuaW5nJTIwZGV3fGVufDB8fHx8MTc3NTU2ODc5NXww&ixlib=rb-4.1.0&q=85",
+        "description": "water dew on leaf",
+        "category": "placeholder"
+      },
+      "market_produce": {
+        "url": "https://images.pexels.com/photos/5425794/pexels-photo-5425794.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Basket of fresh vegetables",
+        "category": "content"
+      },
+      "farmer_avatar": {
+        "url": "https://images.pexels.com/photos/5933416/pexels-photo-5933416.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Portrait of an elderly Indian farmer",
+        "category": "avatar"
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "This is a mobile-first app. Structure the main layout to be max-w-md mx-auto, mimicking a phone screen. Ensure a mobile wrapper container is used to restrict the width on desktop.",
+    "Ensure the floating voice assistant is visually prominent and accessible from all screens except Splash/Onboarding if not needed. Ensure it has a strong z-index.",
+    "For the bottom navigation, use fixed positioning inside the mobile container and adequate bottom padding (`pb-28`) on the main scrollable content so it's not hidden.",
+    "Use Lucide-React icons (e.g., Mic, Home, Leaf, CloudSun, Calendar, ShoppingBag, User).",
+    "Make sure all inputs and buttons have huge touch targets (min h-14) suitable for farmers.",
+    "Use the exact color hex codes provided, avoiding raw black/white text where possible (use #1F2924 for text).",
+    "Include 'data-testid' on all interactive elements.",
+    "Use Framer Motion or Tailwind's ping utility for the voice pulsing animations."
+  ]
+}

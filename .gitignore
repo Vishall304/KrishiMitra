@@ -7,18 +7,52 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build
 dist
 dist-ssr
+build
+
+# Env files (IMPORTANT)
+.env
+.env.*
 *.local
 
-# Editor directories and files
+# IDE / Editors
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# OS files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# Next.js / React / Vite
+.next
+out
+*.tsbuildinfo
+
+# Coverage
+coverage
+
+# Python (optional, safe)
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Deployment
+.vercel
+
+# Cache
+.cache/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Misc
+*.pem
