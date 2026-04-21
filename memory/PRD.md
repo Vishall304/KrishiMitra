@@ -1,61 +1,100 @@
 # PRD — KrishiMitra / AgriSathi
 
 ## Original problem statement
-> Improve and complete my EXISTING React + Firebase project called "KrishiMitra". Do NOT create a new project. Do NOT redesign the entire UI. Work on the existing codebase only. Make the app fully working, clean UI, bug-free, demo-ready. Minimal UI changes (no emojis → lucide icons, bottom nav icons-only, alignment/spacing, mobile responsiveness, keep layout). Fix: Auth, Profile, Crop Detection, AI Assistant (mocked), Tracker, Reminders. Firebase: all collections (users, activities, reminders, cropDetections). Storage: profile + crop image uploads. Error handling: no blank screens.
+> Improve and complete my EXISTING React + Firebase project called "KrishiMitra". Work on existing codebase only. Minimal UI polish. Fix auth/profile/crop-detection/AI-assistant/tracker/reminders. Integrate a secure AI (key not exposed to frontend), smart fallback if unavailable. Prepare for Vercel deployment.
 
 ## Tech stack
-- **Vite 8** + React 19 + TypeScript
+- **Vite 8** + React 19 + TypeScript (frontend)
 - Firebase (Auth, Firestore, Storage) — project `krishix-eaccb`
-- Tailwind CSS v4 + DM Sans
+- Tailwind CSS v4 + DM Sans typography
 - lucide-react icons + framer-motion micro-interactions
 - React Router v7
+- **Backend**: FastAPI (`/app/backend/server.py`) — minimal, AI-focused
+- **Vercel**: Python serverless mirror at `/app/api/chat.py`
 
 ## Project layout
-- `/app` (root) — actual Vite app (cloned from GitHub user repo)
-- `/app/frontend/package.json` — thin shim that `cd ..`s to root and runs Vite on port 3000 (matches the supervisor-managed `frontend` program)
-- `/app/src/...` — screens, services, context
-- `/app/firestore.rules`, `/app/storage.rules`, `/app/firestore.indexes.json`, `/app/firebase.json` — deploy artifacts
+```
+/app
+├── src/                          # Vite React app
+│   ├── screens/                  # Home, Detect, AI, Tracker, Profile, auth/*
+│   ├── services/                 # Firebase + aiService + weatherService
+│   ├── components/layout/        # BottomNav (icon-only), TopNav
+│   ├── context/AuthContext.tsx
+│   └── routes/ProtectedRoute.tsx
+├── backend/
+│   ├── server.py                 # FastAPI /api/ai/chat + /api/weather
+│   └── .env                      # EMERGENT_LLM_KEY, AI_MODEL
+├── api/                          # Vercel serverless python mirror
+│   ├── chat.py
+│   └── requirements.txt          # includes --extra-index-url for emergentintegrations
+├── frontend/package.json         # thin shim: cd .. && yarn dev (matches supervisor)
+├── firestore.rules
+├── storage.rules
+├── firestore.indexes.json
+├── firebase.json
+└── vercel.json                   # build + rewrite /api/ai/chat → /api/chat
+```
 
 ## User personas
-- **Farmer (primary)** — needs quick access to daily activity logging, reminders, crop identification, and AI advice in their preferred language. Mobile-first, low literacy friendly.
+- **Farmer (primary)** — needs daily activity logging, reminders, crop ID, and AI advice in their preferred language. Mobile-first, low-literacy-friendly.
 
 ## Core requirements (static)
 - Email/password auth with persistent session
 - Bottom nav: **icons only**, 5 tabs (Home, Detect, AI, Tracker, Profile)
-- No emojis anywhere — only lucide-react SVG icons
-- All screens mobile-responsive, `max-w-lg` container
-- Per-user data isolation (`userId` filter on every collection query, plus Firestore rules enforcing it)
+- No emojis — only lucide-react SVGs
+- Per-user data isolation (`userId` filter on every query + server-side Firestore rules)
+- Secure AI — API key server-side only
+- Hindi / Marathi / English AI replies
+- Graceful fallback when AI provider is unreachable
 
-## What's been implemented (2026-04-21)
-- ✅ Repo cloned into `/app`, supervisor bridged via `/app/frontend/package.json` shim so `yarn start` runs Vite on 3000
-- ✅ README merge-conflict markers removed and replaced with clean README
-- ✅ `vite.config.ts` configured for `0.0.0.0:3000`, `allowedHosts: true`, `wss` HMR for preview tunnel
-- ✅ TypeScript compiles clean (`yarn tsc --noEmit`)
-- ✅ Signup → Firebase Auth + Firestore `users/{uid}` doc creation
-- ✅ Login with friendly `formatAuthError` messages + session persistence
-- ✅ Bottom nav: icon-only (already in repo, verified)
-- ✅ Home (quick actions + feed + FAB), Detect (upload → mocked analysis → Firestore+Storage), AI (mocked replies + chatHistory), Tracker (activity + reminder CRUD), Profile (edit + photo upload)
-- ✅ Data-testid added on primary auth + nav buttons for test automation
-- ✅ New `formatFirestoreError` wrapper surfaces friendlier messages (incl. permission-denied)
-- ✅ `firestore.rules`, `storage.rules`, `firebase.json`, `firestore.indexes.json` authored for one-shot deployment
-- ✅ E2E testing run (iteration_2): auth, session, nav, home, AI chat, profile load all PASS
+## What's been implemented (as of 2026-04-21)
+
+### Iteration 1 — Wire-up & audit
+- Cloned repo into `/app`, bridged Vite to supervisor via `/app/frontend/package.json` shim (port 3000).
+- Fixed `README.md` merge-conflict markers; authored proper README.
+- Vite config: `0.0.0.0:3000`, `allowedHosts: true`, `wss` HMR for preview tunnel.
+- TypeScript compiles clean (`yarn tsc --noEmit`).
+- Verified all screens already meet the "no emojis / lucide icons / icon-only bottom nav" spec.
+- Added `data-testid` on primary auth + nav buttons.
+- Friendly `formatFirestoreError` wrapper wired into Tracker + Detect screens.
+- Authored `firestore.rules`, `storage.rules`, `firestore.indexes.json`, `firebase.json` for one-shot Firebase deploy.
+
+### Iteration 2 — Secure AI integration
+- **Replaced the legacy 922-line `backend/server.py`** with a focused 200-line FastAPI app exposing `/api/ai/chat` (Gemini 2.5 Flash via `emergentintegrations` + Emergent Universal Key) + `/api/weather` (mock).
+- Added `backend/.env` with `EMERGENT_LLM_KEY` (never exposed to client).
+- Created **Vercel serverless mirror** at `/app/api/chat.py` (`BaseHTTPRequestHandler`) with same logic + CORS.
+- Created `/app/api/requirements.txt` with `emergentintegrations` + its custom `--extra-index-url`.
+- Created `/app/vercel.json` with Vite build + rewrite `/api/ai/chat → /api/chat` for production.
+- Wrote new `src/services/aiService.ts` — calls `/api/ai/chat`, 3-language normalization, client-side fallback on network failure.
+- Wrote new `src/services/weatherService.ts` — mock-first, swap to real API via `VITE_WEATHER_ENDPOINT`.
+- Rewired `AIScreen.tsx` — real LLM roundtrip, typing indicator, multi-turn session context, language-aware welcome message.
+- **Fixed UX bug** — `ProtectedRoute` no longer unmounts `MainShell` on profile re-fetches (only gates on first-login `initializing`). Previously caused the AI tab to snap back to Home if tapped <8s after signup.
+- `yarn build` passes (Vercel-ready).
+- Verified 7/7 backend pytest pass; real LLM replies in en/hi/mr on the live preview.
+
+### Testing status
+- **Backend (`/api/ai/chat`, `/api/`, `/api/weather`)**: 100% pytest pass.
+- **Frontend**: auth + session + nav + home + AI real-LLM flow + typing indicator + multi-language all verified live.
 
 ## Known blockers (external — not code)
-- 🔶 **Firestore security rules on project `krishix-eaccb` currently deny read/write** to `activities`, `reminders`, `cropDetections` even for the owning user. User must deploy `/app/firestore.rules` (see README / test_credentials.md). Until then, Tracker CRUD, Reminder CRUD, and Crop Detection save/history will surface a friendly permission-error banner.
-- 🔶 **Storage rules** same — deploy `/app/storage.rules` alongside Firestore rules.
+- 🔶 **Firestore rules on project `krishix-eaccb` still deny `activities`, `reminders`, `cropDetections`, `chatHistory`** until the user runs `firebase deploy --only firestore:rules,firestore:indexes,storage`. The rules file is already authored and correct.
 
 ## Prioritized backlog
-- **P0 (needs user action)** Deploy `firestore.rules` + `storage.rules` to Firebase project.
-- **P1** Re-run testing agent after rules deploy to validate Tracker/Reminders/Detect CRUD end-to-end.
-- **P1** Switch AI assistant mock to real LLM (Gemini via Universal Key) — user said "mock for now".
-- **P2** Offline-first activity log (IndexedDB cache) for flaky connectivity in fields.
-- **P2** Push reminders (Firebase Cloud Messaging) at reminderDate + reminderTime.
-- **P2** Real crop ML via PlantVillage / Roboflow API.
-- **P3** Full i18n of UI strings (currently only input labels are bilingual; chrome is English).
+- **P0 (needs user action)** Deploy `firestore.rules` + `storage.rules` + `firestore.indexes.json` to Firebase.
+- **P1** After rules deploy, re-run full QA sweep to validate Tracker/Reminder/CropDetection CRUD + profile photo upload end-to-end.
+- **P1** Deploy to Vercel — set `EMERGENT_LLM_KEY` in Vercel project env.
+- **P2** Real weather API (OpenWeatherMap / WeatherAPI) — swap `weatherService.ts` endpoint.
+- **P2** Real crop ML (PlantVillage / Roboflow) — swap `DetectScreen.analyze` dummy call.
+- **P2** Offline-first activity log via IndexedDB for flaky connectivity.
+- **P2** FCM push notifications at reminder date+time.
+- **P3** Full UI chrome i18n (currently labels are English; AI replies are already multilingual).
 
 ## Test credentials
 See `/app/memory/test_credentials.md`.
 
 ## Architecture decisions
-- Kept Vite at repo root (not moved to `/app/frontend`) so the existing user codebase structure is preserved. Supervisor compatibility is achieved via a shim `package.json`.
-- Firestore rules use `request.auth.uid == resource.data.userId` ownership pattern. Index file pre-defines the `(userId ASC, createdAt DESC)` composite index that matches every service query.
+- **Root-level Vite app preserved**: supervisor compatibility achieved via thin shim `/app/frontend/package.json` (cd's to /app, runs Vite on 3000). Preserves the user's original repo structure.
+- **Dual backend layout**: one FastAPI server for the in-cluster preview (Kubernetes ingress routes `/api/*` → backend:8001) and one Vercel Python serverless for production. Same shape/logic; frontend code is identical in both environments.
+- **Server-side key**: `EMERGENT_LLM_KEY` is in `backend/.env` and needs to be set as a Vercel Project env var for production — never exposed through Vite.
+- **Multilingual system prompts** ship as code constants (not LLM-interpolated) for reliability.
+- **Graceful degradation**: both server-side (LLM error → local fallback reply) and client-side (network error → client mock) never show blank screens.
