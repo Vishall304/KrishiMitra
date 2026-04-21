@@ -2,13 +2,13 @@ import type { ReactNode } from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  PlusCircleIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  XMarkIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/react/24/outline'
+  CheckCircle,
+  Clock,
+  Pencil,
+  PlusCircle,
+  Trash2,
+  X,
+} from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import {
   addActivity,
@@ -211,10 +211,11 @@ export function TrackerScreen() {
         <button
           type="button"
           onClick={() => setOpenActivity(true)}
-          className="inline-flex min-h-[48px] items-center justify-center gap-2 self-stretch rounded-2xl bg-green-600 px-5 py-3 text-base font-semibold text-white shadow-lg shadow-green-900/15 transition hover:bg-green-700 active:scale-[0.99] sm:self-auto"
+          title="Add activity"
+          aria-label="Add activity"
+          className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-600 text-white shadow-lg shadow-green-900/15 transition duration-200 ease-out hover:scale-105 hover:bg-green-700 active:scale-[0.99] sm:self-auto"
         >
-          <PlusCircleIcon className="h-6 w-6" />
-          Add activity
+          <PlusCircle className="h-7 w-7" strokeWidth={2} aria-hidden />
         </button>
       </div>
 
@@ -225,7 +226,7 @@ export function TrackerScreen() {
       <section className="rounded-3xl border border-green-100 bg-white p-4 shadow-md shadow-green-900/5">
         <div className="flex items-center justify-between gap-2">
           <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-            <ClockIcon className="h-6 w-6 text-green-600" />
+            <Clock className="h-6 w-6 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} />
             Reminders
           </h3>
           <button
@@ -242,9 +243,11 @@ export function TrackerScreen() {
               })
               setOpenReminder(true)
             }}
-            className="text-sm font-semibold text-green-700 hover:underline"
+            title="Add reminder"
+            aria-label="Add reminder"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-green-700 transition duration-200 ease-out hover:scale-105 hover:bg-green-100 hover:text-green-900"
           >
-            + Add
+            <PlusCircle className="h-6 w-6" strokeWidth={2} aria-hidden />
           </button>
         </div>
         {loading ? (
@@ -268,19 +271,21 @@ export function TrackerScreen() {
                 <div className="flex shrink-0 gap-1">
                   <button
                     type="button"
+                    title="Edit reminder"
                     aria-label="Edit reminder"
                     onClick={() => openEditReminder(r)}
-                    className="rounded-full p-2 text-green-800 hover:bg-green-100"
+                    className="rounded-full p-2 text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-100 hover:text-green-900"
                   >
-                    <PencilSquareIcon className="h-5 w-5" />
+                    <Pencil className="h-5 w-5" strokeWidth={2} />
                   </button>
                   <button
                     type="button"
+                    title="Delete reminder"
                     aria-label="Delete reminder"
                     onClick={() => void removeReminder(r.id)}
-                    className="rounded-full p-2 text-red-700 hover:bg-red-50"
+                    className="rounded-full p-2 text-red-700 transition duration-200 ease-out hover:scale-105 hover:bg-red-50 hover:text-red-800"
                   >
-                    <TrashIcon className="h-5 w-5" />
+                    <Trash2 className="h-5 w-5" strokeWidth={2} />
                   </button>
                 </div>
               </li>
@@ -319,28 +324,30 @@ export function TrackerScreen() {
                     }`}
                   >
                     {a.status === 'done' ? (
-                      <CheckCircleIcon className="h-5 w-5" aria-hidden />
+                      <CheckCircle className="h-5 w-5" strokeWidth={2} aria-hidden />
                     ) : (
-                      <ClockIcon className="h-5 w-5" aria-hidden />
+                      <Clock className="h-5 w-5" strokeWidth={2} aria-hidden />
                     )}
                     {a.status === 'done' ? 'Done' : 'Pending'}
                   </span>
                   <div className="flex gap-1">
                     <button
                       type="button"
+                      title="Edit activity"
                       aria-label="Edit activity"
                       onClick={() => setEditActivity({ ...a })}
-                      className="rounded-full p-2 text-green-800 hover:bg-green-50"
+                      className="rounded-full p-2 text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-50 hover:text-green-900"
                     >
-                      <PencilSquareIcon className="h-5 w-5" />
+                      <Pencil className="h-5 w-5" strokeWidth={2} />
                     </button>
                     <button
                       type="button"
+                      title="Delete activity"
                       aria-label="Delete activity"
                       onClick={() => void removeActivity(a.id)}
-                      className="rounded-full p-2 text-red-700 hover:bg-red-50"
+                      className="rounded-full p-2 text-red-700 transition duration-200 ease-out hover:scale-105 hover:bg-red-50 hover:text-red-800"
                     >
-                      <TrashIcon className="h-5 w-5" />
+                      <Trash2 className="h-5 w-5" strokeWidth={2} />
                     </button>
                   </div>
                 </div>
@@ -556,8 +563,14 @@ function ModalWrap({
       >
         <div className="flex items-start justify-between gap-3">
           <h4 className="text-lg font-bold text-slate-900">{title}</h4>
-          <button type="button" aria-label="Close" className="rounded-full p-2 text-slate-500 hover:bg-slate-100" onClick={onClose}>
-            <XMarkIcon className="h-6 w-6" />
+          <button
+            type="button"
+            title="Close"
+            aria-label="Close"
+            className="rounded-full p-2 text-slate-500 transition duration-200 ease-out hover:scale-105 hover:bg-slate-100 hover:text-slate-800"
+            onClick={onClose}
+          >
+            <X className="h-6 w-6" strokeWidth={2} />
           </button>
         </div>
         {children}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { Leaf } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 
 export function LoginScreen() {
@@ -41,8 +42,9 @@ export function LoginScreen() {
     <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center bg-slate-50 px-4 py-10 font-sans antialiased">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
         <header className="text-center">
-          <p className="text-2xl font-bold text-green-700">
-            AgriSathi <span aria-hidden>🌱</span>
+          <p className="flex items-center justify-center gap-1.5 text-2xl font-bold text-green-700">
+            AgriSathi
+            <Leaf className="h-7 w-7 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} aria-hidden />
           </p>
           <h1 className="mt-2 text-xl font-bold text-slate-900">Farmer login</h1>
           <p className="mt-1 text-sm text-slate-600">Sign in with your email and password.</p>

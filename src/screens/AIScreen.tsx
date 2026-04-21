@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
+import { Mic, Send } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { fetchChatHistoryForUser, saveChatTurn } from '../services/chatHistoryService'
@@ -166,19 +166,21 @@ export function AIScreen() {
           />
           <button
             type="button"
+            title="Voice input (demo)"
             aria-label="Voice input (demo)"
-            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-xl text-green-800 transition hover:bg-green-200 active:scale-95"
+            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-200 hover:text-green-900 active:scale-95"
           >
-            🎤
+            <Mic className="h-6 w-6" strokeWidth={2} aria-hidden />
           </button>
           <button
             type="button"
             onClick={send}
             disabled={!canSend}
-            aria-label="Send"
-            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-600 text-white shadow-md transition hover:bg-green-700 enabled:active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+            title="Send message"
+            aria-label="Send message"
+            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-600 text-white shadow-md transition duration-200 ease-out hover:scale-105 hover:bg-green-700 enabled:active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:hover:scale-100"
           >
-            <PaperAirplaneIcon className="h-6 w-6 -rotate-12" />
+            <Send className="h-6 w-6" strokeWidth={2} aria-hidden />
           </button>
         </div>
       </div>

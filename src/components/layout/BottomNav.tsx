@@ -1,34 +1,30 @@
 import { motion } from 'framer-motion'
-import {
-  ChartBarSquareIcon,
-  CameraIcon,
-  HomeIcon,
-  SparklesIcon,
-  UserCircleIcon,
-} from '@heroicons/react/24/solid'
+import type { LucideIcon } from 'lucide-react'
+import { Camera, ClipboardList, Home, Sparkles, UserCircle } from 'lucide-react'
 import type { TabId } from '../../types'
 
 type TabDef = {
   id: TabId
   label: string
-  emoji: string
-  Icon: typeof HomeIcon
+  Icon: LucideIcon
 }
 
 const leftTabs: TabDef[] = [
-  { id: 'home', label: 'Home', emoji: '🏠', Icon: HomeIcon },
-  { id: 'detect', label: 'Detect', emoji: '📸', Icon: CameraIcon },
+  { id: 'home', label: 'Home', Icon: Home },
+  { id: 'detect', label: 'Detect crop', Icon: Camera },
 ]
 
 const rightTabs: TabDef[] = [
-  { id: 'tracker', label: 'Tracker', emoji: '📊', Icon: ChartBarSquareIcon },
-  { id: 'profile', label: 'Profile', emoji: '👤', Icon: UserCircleIcon },
+  { id: 'tracker', label: 'Activity tracker', Icon: ClipboardList },
+  { id: 'profile', label: 'Profile', Icon: UserCircle },
 ]
 
 type Props = {
   active: TabId
   onChange: (id: TabId) => void
 }
+
+const iconTap = 'h-6 w-6 shrink-0 transition-colors duration-200'
 
 function TabButton({
   tab,
@@ -40,27 +36,27 @@ function TabButton({
   onChange: (id: TabId) => void
 }) {
   const isActive = active === tab.id
+  const Icon = tab.Icon
   return (
     <button
       type="button"
       onClick={() => onChange(tab.id)}
-      aria-label={`${tab.label} ${tab.emoji}`}
+      title={tab.label}
+      aria-label={tab.label}
       aria-current={isActive ? 'page' : undefined}
-      className="group flex min-w-0 flex-1 flex-col items-center gap-1 pb-2 pt-1 text-[11px] font-semibold text-slate-500 transition active:scale-95 data-[active=true]:text-green-700"
+      className="group flex min-w-0 flex-1 flex-col items-center justify-end pb-2 pt-1 text-slate-500 transition active:scale-95 data-[active=true]:text-green-800"
       data-active={isActive}
     >
       <span
         className={[
-          'inline-flex h-11 w-11 items-center justify-center rounded-2xl transition',
+          'inline-flex h-11 w-11 items-center justify-center rounded-2xl transition duration-200 ease-out',
+          'hover:scale-105 hover:text-green-700',
           isActive
             ? 'bg-green-100 text-green-800 shadow-sm ring-1 ring-green-200/80'
             : 'bg-slate-100 text-slate-500 group-hover:bg-green-50',
         ].join(' ')}
       >
-        <tab.Icon className="h-6 w-6" />
-      </span>
-      <span className="truncate leading-tight">
-        {tab.label} {tab.emoji}
+        <Icon className={iconTap} strokeWidth={isActive ? 2.25 : 2} aria-hidden />
       </span>
     </button>
   )
@@ -74,7 +70,7 @@ export function BottomNav({ active, onChange }: Props) {
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-green-100 bg-white/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 shadow-[0_-8px_30px_rgba(22,163,74,0.08)] backdrop-blur-md"
       aria-label="Primary"
     >
-      <div className="mx-auto flex max-w-lg items-end justify-between px-1">
+      <div className="mx-auto flex max-w-lg items-end justify-between gap-0.5 px-1">
         {leftTabs.map((tab) => (
           <TabButton key={tab.id} tab={tab} active={active} onChange={onChange} />
         ))}
@@ -83,20 +79,19 @@ export function BottomNav({ active, onChange }: Props) {
           <motion.button
             type="button"
             onClick={() => onChange('ai')}
+            title="AI assistant"
             aria-label="AI assistant"
             aria-current={aiActive ? 'page' : undefined}
             whileTap={{ scale: 0.94 }}
             className={[
-              'absolute -top-9 flex h-[4.25rem] w-[4.25rem] flex-col items-center justify-center rounded-full text-white shadow-xl ring-4 transition',
-              aiActive
-                ? 'bg-green-600 ring-green-100'
-                : 'bg-green-500 ring-white hover:bg-green-600',
+              'absolute -top-9 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full text-white shadow-xl ring-4 transition duration-200 ease-out',
+              'hover:scale-105 hover:ring-green-50',
+              aiActive ? 'bg-green-600 ring-green-100' : 'bg-green-500 ring-white hover:bg-green-600',
             ].join(' ')}
           >
-            <SparklesIcon className="h-8 w-8 drop-shadow" />
-            <span className="mt-0.5 text-[10px] font-bold uppercase tracking-wide">🤖 AI</span>
+            <Sparkles className="h-7 w-7 drop-shadow" strokeWidth={2} aria-hidden />
           </motion.button>
-          <span className="invisible text-[11px]">AI</span>
+          <span className="h-[11px]" aria-hidden />
         </div>
 
         {rightTabs.map((tab) => (

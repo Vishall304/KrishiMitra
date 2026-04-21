@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { motion } from 'framer-motion'
-import {
-  ArrowRightStartOnRectangleIcon,
-  CameraIcon,
-  CloudIcon,
-  MapPinIcon,
-  SparklesIcon,
-  SunIcon,
-} from '@heroicons/react/24/outline'
+import { Camera, Cloud, LogOut, MapPin, Sparkles, Sun, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { weatherSnapshot } from '../data/dummy'
 import { useAuth } from '../hooks/useAuth'
@@ -132,22 +125,26 @@ export function ProfileScreen() {
       >
         <div className="flex items-start gap-4">
           <div className="relative">
-            <img
-              src={
-                avatarSrc ||
-                'data:image/svg+xml,' +
-                  encodeURIComponent(
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill="#dcfce7" width="80" height="80"/><text x="40" y="48" text-anchor="middle" font-size="28">👤</text></svg>`,
-                  )
-              }
-              alt="Profile"
-              className="h-20 w-20 rounded-3xl object-cover ring-4 ring-white shadow-md"
-            />
+            {avatarSrc ? (
+              <img
+                src={avatarSrc}
+                alt="Profile"
+                className="h-20 w-20 rounded-3xl object-cover ring-4 ring-white shadow-md"
+              />
+            ) : (
+              <div
+                title="Profile"
+                className="flex h-20 w-20 items-center justify-center rounded-3xl bg-green-100 ring-4 ring-white shadow-md transition duration-200 ease-out hover:scale-[1.02] hover:bg-green-200"
+              >
+                <User className="h-10 w-10 text-green-800 transition-colors hover:text-green-900" strokeWidth={1.75} aria-hidden />
+              </div>
+            )}
             <label
               htmlFor={photoInputId}
-              className="absolute -bottom-1 -right-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-green-600 text-white shadow-md ring-2 ring-white transition hover:bg-green-700"
+              title="Change photo"
+              className="absolute -bottom-1 -right-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-green-600 text-white shadow-md ring-2 ring-white transition duration-200 ease-out hover:scale-105 hover:bg-green-700"
             >
-              <CameraIcon className="h-5 w-5" />
+              <Camera className="h-5 w-5" strokeWidth={2} aria-hidden />
               <span className="sr-only">Change photo</span>
             </label>
             <input
@@ -162,16 +159,17 @@ export function ProfileScreen() {
           <div className="min-w-0 flex-1 text-left">
             <h2 className="truncate text-xl font-bold text-slate-900">{draft.fullName || 'Farmer'}</h2>
             <p className="mt-1 flex items-center gap-1 text-sm font-medium text-slate-600">
-              <MapPinIcon className="h-4 w-4 shrink-0 text-green-700" />
+              <MapPin className="h-4 w-4 shrink-0 text-green-700 transition duration-200 ease-out hover:scale-110 hover:text-green-800" strokeWidth={2} aria-hidden />
               <span className="truncate">{locationLabel}</span>
             </p>
             <button
               type="button"
               onClick={() => void logout()}
-              className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-green-800 ring-1 ring-green-200 transition hover:bg-green-50"
+              title="Log out"
+              aria-label="Log out"
+              className="mt-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-green-800 ring-1 ring-green-200 transition duration-200 ease-out hover:scale-105 hover:bg-green-50 hover:text-green-900"
             >
-              <ArrowRightStartOnRectangleIcon className="h-4 w-4" />
-              Log out
+              <LogOut className="h-5 w-5" strokeWidth={2} aria-hidden />
             </button>
           </div>
         </div>
@@ -199,7 +197,7 @@ export function ProfileScreen() {
 
       <section className="rounded-3xl border border-green-100 bg-white p-5 shadow-md">
         <div className="flex items-center gap-2">
-          <SparklesIcon className="h-6 w-6 text-green-600" />
+          <Sparkles className="h-6 w-6 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} aria-hidden />
           <h3 className="text-lg font-bold text-slate-900">Your details</h3>
         </div>
         {(error || photoError) && (
@@ -246,7 +244,7 @@ export function ProfileScreen() {
             <p className="text-xs font-bold uppercase tracking-wide text-green-800">Weather snapshot</p>
             <h3 className="mt-1 text-lg font-bold text-slate-900">{weatherSnapshot.place}</h3>
           </div>
-          <SunIcon className="h-10 w-10 text-amber-500" aria-hidden />
+          <Sun className="h-10 w-10 text-amber-500 transition duration-200 ease-out hover:scale-105 hover:text-amber-600" strokeWidth={1.75} aria-hidden />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-white/80 p-3 ring-1 ring-green-100">
@@ -258,7 +256,7 @@ export function ProfileScreen() {
             <p className="text-xs font-semibold text-slate-500">Humidity</p>
             <p className="mt-1 text-xl font-bold text-slate-900">{weatherSnapshot.humidity}%</p>
             <p className="flex items-center gap-1 text-sm text-slate-600">
-              <CloudIcon className="h-4 w-4" />
+              <Cloud className="h-4 w-4 transition duration-200 ease-out hover:scale-110" strokeWidth={2} aria-hidden />
               Rain chance {weatherSnapshot.rainChance}%
             </p>
           </div>

@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  ArrowPathIcon,
-  CameraIcon,
-  ClockIcon,
-  PhotoIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/outline'
+import { Camera, Clock, Image as ImageIcon, RefreshCw, Sparkles } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { fetchCropDetectionsForUser, saveCropDetection } from '../services/cropDetectionService'
 import { uploadCropImage } from '../services/storageService'
@@ -114,8 +108,8 @@ export function DetectScreen() {
     <div className="space-y-5 pb-28">
       <div className="rounded-3xl border border-green-100 bg-white p-5 shadow-md shadow-green-900/5">
         <div className="flex items-start gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-green-800">
-            <CameraIcon className="h-7 w-7" />
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-200 hover:text-green-900">
+            <Camera className="h-7 w-7" strokeWidth={2} aria-hidden />
           </span>
           <div>
             <h2 className="text-lg font-bold text-slate-900">Crop detection</h2>
@@ -139,7 +133,7 @@ export function DetectScreen() {
             exit={{ opacity: 0, y: -8 }}
             className="rounded-3xl border-2 border-dashed border-green-200 bg-green-50/80 p-6 text-center shadow-inner"
           >
-            <PhotoIcon className="mx-auto h-14 w-14 text-green-700" />
+            <ImageIcon className="mx-auto h-14 w-14 text-green-700 transition duration-200 ease-out hover:scale-105 hover:text-green-800" strokeWidth={1.75} />
             <p className="mt-3 font-semibold text-slate-900">Upload an image</p>
             <p className="mt-1 text-sm text-slate-600">PNG or JPG from your gallery</p>
             <input
@@ -153,10 +147,11 @@ export function DetectScreen() {
             />
             <label
               htmlFor={inputId}
-              className="mt-5 inline-flex min-h-[48px] cursor-pointer items-center justify-center rounded-2xl bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-green-900/20 transition hover:bg-green-700 active:scale-[0.98]"
+              title="Choose photo or open camera"
+              className="mx-auto mt-5 flex h-14 w-14 cursor-pointer items-center justify-center rounded-2xl bg-green-600 text-white shadow-lg shadow-green-900/20 transition duration-200 ease-out hover:scale-105 hover:bg-green-700 active:scale-[0.98]"
             >
-              <CameraIcon className="mr-2 h-6 w-6" />
-              Choose / camera
+              <Camera className="h-7 w-7" strokeWidth={2} aria-hidden />
+              <span className="sr-only">Choose photo or camera</span>
             </label>
           </motion.div>
         )}
@@ -170,24 +165,26 @@ export function DetectScreen() {
             className="overflow-hidden rounded-3xl border border-green-100 bg-white shadow-lg"
           >
             <img src={previewUrl} alt="Crop preview" className="aspect-[4/3] w-full object-cover" />
-            <div className="flex flex-col gap-3 p-4 sm:flex-row">
+            <div className="flex flex-wrap items-center justify-center gap-4 p-4 sm:flex-row sm:justify-center">
               <button
                 type="button"
                 onClick={() => void analyze()}
                 disabled={working}
-                className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-2xl bg-green-600 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-700 disabled:opacity-60 active:scale-[0.98]"
+                title={working ? 'Saving…' : 'Analyze and save'}
+                aria-label={working ? 'Saving…' : 'Analyze and save'}
+                className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-green-600 text-white shadow-md transition duration-200 ease-out hover:scale-105 hover:bg-green-700 disabled:opacity-60 disabled:hover:scale-100 active:scale-[0.98]"
               >
-                <SparklesIcon className="mr-2 h-6 w-6" />
-                {working ? 'Saving…' : 'Analyze & save'}
+                <Sparkles className="h-7 w-7" strokeWidth={2} aria-hidden />
               </button>
               <button
                 type="button"
                 onClick={reset}
                 disabled={working}
-                className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-2xl border border-green-200 bg-white px-4 py-3 text-base font-semibold text-green-800 transition hover:bg-green-50 active:scale-[0.98]"
+                title="Retake photo"
+                aria-label="Retake photo"
+                className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-green-200 bg-white text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-50 active:scale-[0.98]"
               >
-                <ArrowPathIcon className="mr-2 h-6 w-6" />
-                Retake
+                <RefreshCw className="h-7 w-7" strokeWidth={2} aria-hidden />
               </button>
             </div>
           </motion.div>
@@ -220,10 +217,11 @@ export function DetectScreen() {
               <button
                 type="button"
                 onClick={reset}
-                className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-2xl bg-green-600 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-700 active:scale-[0.98] sm:w-auto sm:px-8"
+                title="New detection"
+                aria-label="New detection"
+                className="mt-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-green-600 text-white shadow-md transition duration-200 ease-out hover:scale-105 hover:bg-green-700 active:scale-[0.98] sm:ml-0"
               >
-                <ArrowPathIcon className="mr-2 h-6 w-6" />
-                New detection
+                <RefreshCw className="h-7 w-7" strokeWidth={2} aria-hidden />
               </button>
             </div>
           </motion.div>
@@ -232,7 +230,7 @@ export function DetectScreen() {
 
       <section className="rounded-3xl border border-green-100 bg-white p-4 shadow-md">
         <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-          <ClockIcon className="h-6 w-6 text-green-600" />
+          <Clock className="h-6 w-6 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} />
           Your detection history
         </h3>
         {historyLoading ? (

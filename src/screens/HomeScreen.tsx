@@ -1,21 +1,21 @@
 import { motion } from 'framer-motion'
 import {
-  BoltIcon,
-  CalendarDaysIcon,
-  CameraIcon,
-  ChevronRightIcon,
-  NewspaperIcon,
-  BuildingLibraryIcon,
-  LightBulbIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/outline'
+  Bolt,
+  Building2,
+  CalendarDays,
+  Camera,
+  ChevronRight,
+  Lightbulb,
+  Newspaper,
+  Sparkles,
+} from 'lucide-react'
 import { feedItems } from '../data/dummy'
 import type { TabId } from '../types'
 
 const iconMap = {
-  newspaper: NewspaperIcon,
-  buildingLibrary: BuildingLibraryIcon,
-  lightBulb: LightBulbIcon,
+  newspaper: Newspaper,
+  buildingLibrary: Building2,
+  lightBulb: Lightbulb,
 } as const
 
 type Props = {
@@ -25,32 +25,29 @@ type Props = {
 const quickActions = [
   {
     key: 'detect',
-    title: 'Detect Crop',
-    emoji: '📸',
-    subtitle: 'Photo-based crop check',
-    Icon: CameraIcon,
+    tooltip: 'Detect crop — photo-based crop check',
+    Icon: Camera,
     tab: 'detect' as TabId,
     gradient: 'from-green-600 to-emerald-600',
   },
   {
     key: 'ai',
-    title: 'Ask AI',
-    emoji: '🤖',
-    subtitle: 'Chat in your language',
-    Icon: SparklesIcon,
+    tooltip: 'Ask AI — chat in your language',
+    Icon: Sparkles,
     tab: 'ai' as TabId,
     gradient: 'from-emerald-600 to-green-700',
   },
   {
     key: 'reminder',
-    title: 'Set Reminder',
-    emoji: '⏰',
-    subtitle: 'Irrigation & field tasks',
-    Icon: CalendarDaysIcon,
+    tooltip: 'Set reminder — irrigation and field tasks',
+    Icon: CalendarDays,
     tab: 'tracker' as TabId,
     gradient: 'from-green-700 to-green-600',
   },
 ]
+
+const cardIconClass =
+  'h-7 w-7 text-white transition duration-200 ease-out group-hover:scale-105 group-hover:text-white'
 
 export function HomeScreen({ onNavigate }: Props) {
   return (
@@ -66,37 +63,34 @@ export function HomeScreen({ onNavigate }: Props) {
           </span>
         </div>
 
-        <div className="grid gap-3">
-          {quickActions.map((action, i) => (
-            <motion.button
-              key={action.key}
-              type="button"
-              onClick={() => onNavigate(action.tab)}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              whileTap={{ scale: 0.985 }}
-              className={`flex w-full items-center gap-4 rounded-3xl bg-gradient-to-br ${action.gradient} p-4 text-left text-white shadow-lg shadow-green-900/15 ring-1 ring-white/20`}
-            >
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-                <action.Icon className="h-8 w-8" aria-hidden />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-2 text-lg font-bold leading-tight">
-                  <span aria-hidden>{action.emoji}</span>
-                  {action.title}
+        <div className="grid grid-cols-3 gap-3">
+          {quickActions.map((action, i) => {
+            const Icon = action.Icon
+            return (
+              <motion.button
+                key={action.key}
+                type="button"
+                title={action.tooltip}
+                aria-label={action.tooltip}
+                onClick={() => onNavigate(action.tab)}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                whileTap={{ scale: 0.985 }}
+                className={`group flex aspect-square max-h-[120px] flex-col items-center justify-center rounded-3xl bg-gradient-to-br ${action.gradient} p-4 text-white shadow-lg shadow-green-900/15 ring-1 ring-white/20 transition duration-200 ease-out hover:brightness-110 sm:aspect-auto sm:min-h-[104px]`}
+              >
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                  <Icon className={cardIconClass} strokeWidth={2} aria-hidden />
                 </span>
-                <span className="mt-0.5 block text-sm font-medium text-white/90">{action.subtitle}</span>
-              </span>
-              <ChevronRightIcon className="h-6 w-6 shrink-0 text-white/80" aria-hidden />
-            </motion.button>
-          ))}
+              </motion.button>
+            )
+          })}
         </div>
       </section>
 
       <section className="space-y-3">
         <div className="flex items-center gap-2 px-1">
-          <BoltIcon className="h-5 w-5 text-green-600" />
+          <Bolt className="h-5 w-5 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} />
           <h3 className="text-lg font-bold text-slate-900">Info feed</h3>
         </div>
         <div className="flex max-h-[min(52vh,420px)] flex-col gap-3 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch]">
@@ -110,8 +104,8 @@ export function HomeScreen({ onNavigate }: Props) {
                 transition={{ delay: 0.15 + i * 0.05 }}
                 className="flex gap-3 rounded-2xl border border-green-100 bg-white p-4 shadow-md shadow-green-900/5"
               >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-green-100">
-                  <Icon className="h-7 w-7" aria-hidden />
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-green-100 transition duration-200 ease-out hover:scale-105 hover:bg-green-100 hover:text-green-800">
+                  <Icon className="h-7 w-7" strokeWidth={2} aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1 text-left">
                   <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
@@ -122,6 +116,11 @@ export function HomeScreen({ onNavigate }: Props) {
                   <h4 className="mt-1 font-semibold leading-snug text-slate-900">{item.title}</h4>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
                 </div>
+                <ChevronRight
+                  className="mt-1 h-6 w-6 shrink-0 self-center text-slate-300 transition duration-200 ease-out hover:scale-105 hover:text-green-600"
+                  strokeWidth={2}
+                  aria-hidden
+                />
               </motion.article>
             )
           })}
@@ -131,16 +130,16 @@ export function HomeScreen({ onNavigate }: Props) {
       <motion.button
         type="button"
         onClick={() => onNavigate('ai')}
+        title="Ask AI"
+        aria-label="Ask AI"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         whileTap={{ scale: 0.94 }}
-        whileHover={{ scale: 1.03 }}
-        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-green-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-green-900/25 ring-2 ring-green-100"
-        aria-label="Open AI assistant"
+        whileHover={{ scale: 1.06 }}
+        className="fixed bottom-24 right-4 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-white shadow-xl shadow-green-900/25 ring-2 ring-green-100 transition-colors duration-200 ease-out hover:bg-green-700 hover:ring-green-200"
       >
-        <SparklesIcon className="h-5 w-5" />
-        Ask AI
+        <Sparkles className="h-7 w-7" strokeWidth={2} aria-hidden />
       </motion.button>
     </div>
   )
