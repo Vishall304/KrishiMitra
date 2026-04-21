@@ -22,6 +22,7 @@ import {
   fetchRemindersForUser,
   updateReminder,
 } from '../services/reminderService'
+import { formatFirestoreError } from '../lib/firestoreErrors'
 import type { ActivityRecord, ReminderRecord } from '../types/models'
 
 const presets = ['Irrigation done', 'Fertilizer added', 'Spray completed'] as const
@@ -72,7 +73,7 @@ export function TrackerScreen() {
       setReminders(r)
     } catch (e) {
       if (import.meta.env.DEV) console.error('[TrackerScreen] refresh failed', e)
-      setError(e instanceof Error ? e.message : 'Could not load activities or reminders.')
+      setError(formatFirestoreError(e, 'load activities'))
     } finally {
       setLoading(false)
     }
@@ -101,7 +102,7 @@ export function TrackerScreen() {
       await refresh()
     } catch (e) {
       if (import.meta.env.DEV) console.error('[TrackerScreen] add activity failed', e)
-      setError(e instanceof Error ? e.message : 'Could not save activity.')
+      setError(formatFirestoreError(e, 'save activity'))
     }
   }
 
@@ -119,7 +120,7 @@ export function TrackerScreen() {
       await refresh()
     } catch (e) {
       if (import.meta.env.DEV) console.error('[TrackerScreen] update activity failed', e)
-      setError(e instanceof Error ? e.message : 'Could not update activity.')
+      setError(formatFirestoreError(e, 'update activity'))
     }
   }
 
@@ -130,7 +131,7 @@ export function TrackerScreen() {
       await refresh()
     } catch (e) {
       if (import.meta.env.DEV) console.error('[TrackerScreen] delete activity failed', e)
-      setError(e instanceof Error ? e.message : 'Could not delete activity.')
+      setError(formatFirestoreError(e, 'delete activity'))
     }
   }
 
@@ -174,7 +175,7 @@ export function TrackerScreen() {
       await refresh()
     } catch (e) {
       if (import.meta.env.DEV) console.error('[TrackerScreen] save reminder failed', e)
-      setError(e instanceof Error ? e.message : 'Could not save reminder.')
+      setError(formatFirestoreError(e, 'save reminder'))
     }
   }
 
@@ -185,7 +186,7 @@ export function TrackerScreen() {
       await refresh()
     } catch (e) {
       if (import.meta.env.DEV) console.error('[TrackerScreen] delete reminder failed', e)
-      setError(e instanceof Error ? e.message : 'Could not delete reminder.')
+      setError(formatFirestoreError(e, 'delete reminder'))
     }
   }
 

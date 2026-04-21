@@ -122,6 +122,7 @@ export function SignupScreen() {
           <button
             type="submit"
             disabled={submitting}
+            data-testid="signup-submit-btn"
             className="mt-2 w-full rounded-2xl bg-green-600 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-700 disabled:opacity-60"
           >
             {submitting ? 'Creating account…' : 'Sign up'}

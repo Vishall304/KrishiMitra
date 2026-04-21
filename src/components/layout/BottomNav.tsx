@@ -44,6 +44,7 @@ function TabButton({
       title={tab.label}
       aria-label={tab.label}
       aria-current={isActive ? 'page' : undefined}
+      data-testid={`nav-${tab.id}-btn`}
       className="group flex min-w-0 flex-1 flex-col items-center justify-end pb-2 pt-1 text-slate-500 transition active:scale-95 data-[active=true]:text-green-800"
       data-active={isActive}
     >
@@ -82,6 +83,7 @@ export function BottomNav({ active, onChange }: Props) {
             title="AI assistant"
             aria-label="AI assistant"
             aria-current={aiActive ? 'page' : undefined}
+            data-testid="nav-ai-btn"
             whileTap={{ scale: 0.94 }}
             className={[
               'absolute -top-9 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full text-white shadow-xl ring-4 transition duration-200 ease-out',

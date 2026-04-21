@@ -87,6 +87,7 @@ export function LoginScreen() {
           <button
             type="submit"
             disabled={submitting}
+            data-testid="login-submit-btn"
             className="w-full rounded-2xl bg-green-600 py-3 text-base font-semibold text-white shadow-md transition hover:bg-green-700 disabled:opacity-60"
           >
             {submitting ? 'Signing in…' : 'Sign in'}

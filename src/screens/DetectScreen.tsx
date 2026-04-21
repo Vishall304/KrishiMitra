@@ -4,6 +4,7 @@ import { Camera, Clock, Image as ImageIcon, RefreshCw, Sparkles } from 'lucide-r
 import { useAuth } from '../hooks/useAuth'
 import { fetchCropDetectionsForUser, saveCropDetection } from '../services/cropDetectionService'
 import { uploadCropImage } from '../services/storageService'
+import { formatFirestoreError } from '../lib/firestoreErrors'
 import type { CropDetectionRecord } from '../types/models'
 
 type Step = 'upload' | 'preview' | 'result'
@@ -37,7 +38,7 @@ export function DetectScreen() {
       setHistory(rows)
     } catch (e) {
       if (import.meta.env.DEV) console.error('[DetectScreen] load history failed', e)
-      setError(e instanceof Error ? e.message : 'Could not load detection history.')
+      setError(formatFirestoreError(e, 'load detection history'))
     } finally {
       setHistoryLoading(false)
     }
@@ -96,7 +97,7 @@ export function DetectScreen() {
       setStep('result')
     } catch (e) {
       if (import.meta.env.DEV) console.error('[DetectScreen] analyze / save failed', e)
-      setError(e instanceof Error ? e.message : 'Upload or save failed. Check Storage rules and network.')
+      setError(formatFirestoreError(e, 'save detection'))
     } finally {
       setWorking(false)
     }

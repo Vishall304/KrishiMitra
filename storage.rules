@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// Firebase Storage security rules for KrishiMitra / AgriSathi.
+//
+// Deploy with:
+//   firebase deploy --only storage
+//
+// Layout:
+//   /profileImages/{uid}/{timestamp}.{ext}
+//   /cropImages/{uid}/{timestamp}.{ext}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isImageUnder15MB() {
+      return request.resource != null
+        && request.resource.size < 15 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Profile photos: owner-write, owner-read.
+    match /profileImages/{uid}/{fileName} {
+      allow read:   if isSelf(uid);
+      allow create: if isSelf(uid) && isImageUnder15MB();
+      allow update: if isSelf(uid) && isImageUnder15MB();
+      allow delete: if isSelf(uid);
+    }
+
+    // Crop photos: owner-write, owner-read.
+    match /cropImages/{uid}/{fileName} {
+      allow read:   if isSelf(uid);
+      allow create: if isSelf(uid) && isImageUnder15MB();
+      allow delete: if isSelf(uid);
+    }
+
+    // Default deny.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
