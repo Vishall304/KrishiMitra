@@ -17,7 +17,7 @@ import pytest
 import requests
 
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/") or \
-    "https://7412125f-3f7d-4d5d-b16f-b514b88920cd.preview.emergentagent.com"
+    "https://crop-detect-demo.preview.emergentagent.com"
 
 
 # --- Unicode helpers ---------------------------------------------------------
