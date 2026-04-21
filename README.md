@@ -1,77 +1,62 @@
-<<<<<<< HEAD
-# React + TypeScript + Vite
+# KrishiMitra / AgriSathi — Farmer App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Mobile-first React + Vite + Firebase app that helps farmers detect crops from photos, track daily farm activities, set reminders, chat with an AI assistant (mocked), and manage their profile.
 
-Currently, two official plugins are available:
+## Tech stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Vite + React 19 + TypeScript**
+- **Firebase** — Auth, Firestore, Storage
+- **Tailwind CSS v4** with DM Sans typography
+- **lucide-react** icons, **framer-motion** micro-interactions
+- **React Router v7** for routing
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Area | Description |
+| --- | --- |
+| Auth | Email/password sign-up and sign-in with persisted session, friendly Firebase error messages. |
+| Home | Quick actions (Detect / AI / Tracker), info feed (news, schemes, tips). |
+| Crop detection | Upload photo → stored in Firebase Storage → mocked ML result saved to Firestore, with history. |
+| AI assistant | Multilingual chat UI (English / हिंदी / मराठी) with mocked replies and Firestore-backed history. |
+| Tracker | Add / edit / delete activities, reminders per user (userId-scoped queries). |
+| Profile | Editable profile, photo upload, aggregated stats (tasks, reminders). |
 
-## Expanding the ESLint configuration
+## Local development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Install dependencies
+yarn install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Copy env and fill Firebase keys
+cp .env.local.example .env.local  # if missing, create .env.local manually
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start dev server
+yarn dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Required environment variables (`.env.local`)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
-=======
-# Here are your Instructions
->>>>>>> d1efb5bfb5fd3bb758ff5cc81eca3dec555960f1
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+## Firebase collections
+
+- `users/{uid}` — profile
+- `cropDetections` — per-user crop photos + mocked analysis
+- `activities` — per-user farm activity log
+- `reminders` — per-user reminders
+- `chatHistory` — per-user AI chat turns
+
+All writes/reads are scoped by the signed-in user's `uid`. Ownership is asserted server-side via Firestore Security Rules and client-side via `assertDocOwnedByUser` for updates/deletes.
+
+## Build
+
+```bash
+yarn build
+```
