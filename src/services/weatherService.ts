@@ -48,7 +48,7 @@ export async function fetchWeather(place = DEFAULT_SNAPSHOT.place): Promise<Weat
     }
   } catch (err) {
     if (import.meta.env.DEV) {
-      console.warn('[AgriSathi][weather] falling back to mock', err)
+      console.warn('[KrishiMitra][weather] falling back to mock', err)
     }
     return { ...DEFAULT_SNAPSHOT, place }
   }

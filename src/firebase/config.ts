@@ -42,7 +42,7 @@ const envComplete = envLooksComplete(env)
 
 if (import.meta.env.DEV) {
   const apiKeyHint = env.apiKey ? `loaded (${env.apiKey.length} chars)` : 'MISSING or empty'
-  console.info('[AgriSathi][firebase][dev] import.meta.env Firebase keys:', {
+  console.info('[KrishiMitra][firebase][dev] import.meta.env Firebase keys:', {
     VITE_FIREBASE_API_KEY: apiKeyHint,
     VITE_FIREBASE_AUTH_DOMAIN: env.authDomain || 'MISSING',
     VITE_FIREBASE_PROJECT_ID: env.projectId || 'MISSING',
@@ -60,7 +60,7 @@ let firebaseReady = false
 
 if (!envComplete) {
   console.warn(
-    `[AgriSathi][firebase] Firebase environment variables are missing or empty. ${CONFIG_HELP}`,
+    `[KrishiMitra][firebase] Firebase environment variables are missing or empty. ${CONFIG_HELP}`,
   )
 } else {
   try {
@@ -78,7 +78,7 @@ if (!envComplete) {
     storageInstance = getStorage(app)
     firebaseReady = true
   } catch (e) {
-    console.warn('[AgriSathi][firebase] initializeApp failed (invalid config or SDK error):', e)
+    console.warn('[KrishiMitra][firebase] initializeApp failed (invalid config or SDK error):', e)
     app = null
     authInstance = null
     dbInstance = null
@@ -88,14 +88,14 @@ if (!envComplete) {
 }
 
 if (!import.meta.env.DEV && !firebaseReady) {
-  console.warn('[AgriSathi][firebase] Firebase is not initialized. Check environment configuration.')
+  console.warn('[KrishiMitra][firebase] Firebase is not initialized. Check environment configuration.')
 }
 
 export { firebaseReady }
 
 export function getFirebaseAuth(): Auth {
   if (!authInstance) {
-    console.warn('[AgriSathi][firebase] Auth is not available.', CONFIG_HELP)
+    console.warn('[KrishiMitra][firebase] Auth is not available.', CONFIG_HELP)
     throw new Error('Firebase Auth is not configured.')
   }
   return authInstance
@@ -103,7 +103,7 @@ export function getFirebaseAuth(): Auth {
 
 export function getFirestoreDb(): Firestore {
   if (!dbInstance) {
-    console.warn('[AgriSathi][firebase] Firestore is not available.', CONFIG_HELP)
+    console.warn('[KrishiMitra][firebase] Firestore is not available.', CONFIG_HELP)
     throw new Error('Firebase Firestore is not configured.')
   }
   return dbInstance
@@ -111,7 +111,7 @@ export function getFirestoreDb(): Firestore {
 
 export function getFirebaseStorage(): FirebaseStorage {
   if (!storageInstance) {
-    console.warn('[AgriSathi][firebase] Storage is not available.', CONFIG_HELP)
+    console.warn('[KrishiMitra][firebase] Storage is not available.', CONFIG_HELP)
     throw new Error('Firebase Storage is not configured.')
   }
   return storageInstance

@@ -74,7 +74,7 @@ export async function sendChatMessage(req: ChatRequest): Promise<ChatResponse> {
     }
   } catch (err) {
     if (import.meta.env.DEV) {
-      console.warn('[AgriSathi][ai] chat request failed, using client fallback', err)
+      console.warn('[KrishiMitra][ai] chat request failed, using client fallback', err)
     }
     return {
       reply: MOCK_REPLIES[language],

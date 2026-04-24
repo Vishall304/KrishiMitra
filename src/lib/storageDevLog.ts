@@ -2,12 +2,12 @@
 export const storageDevLog = {
   ok(action: string, detail?: unknown) {
     if (import.meta.env.DEV) {
-      console.info('[AgriSathi][Storage]', action, detail ?? '')
+      console.info('[KrishiMitra][Storage]', action, detail ?? '')
     }
   },
   fail(action: string, error: unknown) {
     if (import.meta.env.DEV) {
-      console.error('[AgriSathi][Storage]', action, error)
+      console.error('[KrishiMitra][Storage]', action, error)
     }
   },
 }

@@ -2,12 +2,12 @@
 export const firestoreDevLog = {
   ok(collection: string, action: string, detail?: unknown) {
     if (import.meta.env.DEV) {
-      console.info(`[AgriSathi][Firestore][${collection}]`, action, detail ?? '')
+      console.info(`[KrishiMitra][Firestore][${collection}]`, action, detail ?? '')
     }
   },
   fail(collection: string, action: string, error: unknown) {
     if (import.meta.env.DEV) {
-      console.error(`[AgriSathi][Firestore][${collection}]`, action, error)
+      console.error(`[KrishiMitra][Firestore][${collection}]`, action, error)
     }
   },
 }
