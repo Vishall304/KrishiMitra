@@ -1,16 +1,24 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { Mic, Send } from 'lucide-react'
+import { Mic, MicOff, Send, Square } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { fetchChatHistoryForUser, saveChatTurn } from '../services/chatHistoryService'
 import { sendChatMessage } from '../services/aiService'
+import { fetchWeather, type WeatherSnapshot } from '../services/weatherService'
 import type { ChatHistoryRecord } from '../types/models'
 import type { ChatMessage } from '../types'
 
 const welcomeByLanguage: Record<'en' | 'hi' | 'mr', string> = {
-  en: 'Namaste! I am KrishiMitra AI. Ask about pests, fertilizer doses, sowing dates, or crop prices.',
-  hi: 'नमस्ते! मैं KrishiMitra AI हूँ। कीट, खाद की मात्रा, बुवाई का समय या फसल के दामों के बारे में पूछें।',
-  mr: 'नमस्कार! मी KrishiMitra AI आहे. किड, खताचे प्रमाण, पेरणी वेळा किंवा पिकाच्या दरांबद्दल विचारा.',
+  en: 'Namaste! I am KrishiMitra AI. Ask about pests, fertilizer doses, sowing dates, irrigation, or mandi prices — in English, हिंदी, or मराठी.',
+  hi: 'नमस्ते! मैं KrishiMitra AI हूँ। कीट, खाद की मात्रा, बुवाई का समय, सिंचाई या मंडी भाव के बारे में पूछें — हिंदी, मराठी या अंग्रेज़ी में।',
+  mr: 'नमस्कार! मी KrishiMitra AI आहे. किड, खताचे प्रमाण, पेरणीची वेळ, सिंचन किंवा बाजार भावाबद्दल विचारा — मराठी, हिंदी किंवा इंग्रजीत.',
+}
+
+const voiceLangMap: Record<'en' | 'hi' | 'mr', string> = {
+  en: 'en-IN',
+  hi: 'hi-IN',
+  mr: 'mr-IN',
 }
 
 function normaliseLang(l?: string): 'en' | 'hi' | 'mr' {
@@ -24,9 +32,13 @@ function recordsToMessages(records: ChatHistoryRecord[]): ChatMessage[] {
   const out: ChatMessage[] = []
   for (const r of records) {
     out.push({ id: `${r.id}-u`, role: 'user', lang: r.language || 'You', text: r.userMessage })
-    out.push({ id: `${r.id}-a`, role: 'assistant', lang: 'English', text: r.aiResponse })
+    out.push({ id: `${r.id}-a`, role: 'assistant', lang: 'KrishiMitra', text: r.aiResponse })
   }
   return out
+}
+
+function weatherLine(w: WeatherSnapshot): string {
+  return `Current weather near farmer: ${w.place}, ${w.tempC}°C, ${w.condition}, humidity ${w.humidity}%, rain chance ${w.rainChance}%.`
 }
 
 export function AIScreen() {
@@ -45,9 +57,27 @@ export function AIScreen() {
   const [historyLoading, setHistoryLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [text, setText] = useState('')
+  const [weather, setWeather] = useState<WeatherSnapshot | null>(null)
   const sessionIdRef = useRef<string | undefined>(undefined)
 
+  const voice = useSpeechRecognition(voiceLangMap[langCode])
+
   const canSend = useMemo(() => text.trim().length > 0 && !sending, [text, sending])
+
+  // Pull weather once per mount so the AI can reason about it.
+  useEffect(() => {
+    void fetchWeather().then(setWeather).catch(() => setWeather(null))
+  }, [])
+
+  // When the speech hook produces a final transcript, append it to the textarea.
+  // Starting a new recording clears the hook's transcript to '', so we won't double-append.
+  useEffect(() => {
+    if (!voice.transcript) return
+    setText((prev) => {
+      const merged = prev.trim() ? `${prev.trim()} ${voice.transcript}` : voice.transcript
+      return merged.trim()
+    })
+  }, [voice.transcript])
 
   const loadHistory = useCallback(async () => {
     if (!user) return
@@ -89,8 +119,13 @@ export function AIScreen() {
         role: m.role,
         content: m.text,
       }))
+
+      // Inject weather snapshot as a short system-style context line ahead of the user's message.
+      const contextPrefix = weather ? `${weatherLine(weather)}\n` : ''
+      const enrichedMessage = contextPrefix ? `${contextPrefix}\n${t}` : t
+
       const res = await sendChatMessage({
-        message: t,
+        message: enrichedMessage,
         language: langLabel,
         sessionId: sessionIdRef.current,
         history: lastSix.slice(0, -1),
@@ -115,15 +150,41 @@ export function AIScreen() {
     } finally {
       setSending(false)
     }
-  }, [text, user, sending, langLabel, messages, scrollToBottom])
+  }, [text, user, sending, langLabel, messages, scrollToBottom, weather])
+
+  const toggleVoice = useCallback(() => {
+    if (!voice.supported) return
+    if (voice.status === 'listening') {
+      voice.stop()
+    } else {
+      voice.start({ lang: voiceLangMap[langCode] })
+    }
+  }, [voice, langCode])
+
+  const micButtonClass = (() => {
+    if (!voice.supported) {
+      return 'bg-slate-100 text-slate-400 cursor-not-allowed'
+    }
+    if (voice.status === 'listening') {
+      return 'bg-red-500 text-white shadow-md ring-2 ring-red-200 animate-pulse'
+    }
+    return 'bg-green-100 text-green-800 hover:scale-105 hover:bg-green-200 hover:text-green-900 active:scale-95'
+  })()
+
+  const MicIcon = voice.supported ? (voice.status === 'listening' ? Square : Mic) : MicOff
 
   return (
     <div className="flex min-h-[calc(100dvh-8rem)] flex-col pb-28 pt-2">
       <div className="mb-3 rounded-3xl border border-green-100 bg-white px-4 py-3 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-wide text-green-700">AI assistant</p>
         <p className="text-sm text-slate-600">
-          English · हिंदी · मराठी — ask any farming question. Chats are saved to your account.
+          English · हिंदी · मराठी — tap the mic to speak, or type your question. Chats are saved to your account.
         </p>
+        {voice.error && (
+          <p className="mt-2 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-900 ring-1 ring-amber-100">
+            {voice.error}
+          </p>
+        )}
         {historyLoading && <p className="mt-1 text-xs text-slate-500">Loading your past chats…</p>}
       </div>
 
@@ -161,7 +222,7 @@ export function AIScreen() {
           </motion.div>
         ))}
         {sending && (
-          <div className="flex justify-start">
+          <div className="flex justify-start" data-testid="ai-typing-indicator">
             <div className="rounded-2xl rounded-bl-md border border-green-100 bg-white px-4 py-3 text-slate-500 shadow-sm">
               <span className="inline-flex gap-1">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
@@ -181,7 +242,7 @@ export function AIScreen() {
           <textarea
             id={inputId}
             rows={1}
-            value={text}
+            value={voice.status === 'listening' && voice.interim ? `${text} ${voice.interim}`.trim() : text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -189,18 +250,34 @@ export function AIScreen() {
                 void send()
               }
             }}
-            placeholder="Message… / संदेश… / संदेश…"
+            placeholder={
+              voice.status === 'listening'
+                ? 'Listening…'
+                : 'Message… / संदेश… / संदेश…'
+            }
+            readOnly={voice.status === 'listening'}
             data-testid="ai-input"
             className="max-h-28 min-h-[48px] flex-1 resize-none rounded-2xl bg-slate-50 px-3 py-3 text-base text-slate-900 outline-none ring-0 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-green-500"
           />
           <button
             type="button"
-            title="Voice input (coming soon)"
-            aria-label="Voice input (coming soon)"
+            onClick={toggleVoice}
+            disabled={!voice.supported}
+            title={
+              !voice.supported
+                ? 'Voice input not supported on this browser'
+                : voice.status === 'listening'
+                  ? 'Stop listening'
+                  : 'Speak your question'
+            }
+            aria-label={
+              voice.status === 'listening' ? 'Stop listening' : 'Speak your question'
+            }
+            aria-pressed={voice.status === 'listening'}
             data-testid="ai-voice-btn"
-            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-200 hover:text-green-900 active:scale-95"
+            className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition duration-200 ease-out ${micButtonClass}`}
           >
-            <Mic className="h-6 w-6" strokeWidth={2} aria-hidden />
+            <MicIcon className="h-6 w-6" strokeWidth={2} aria-hidden />
           </button>
           <button
             type="button"

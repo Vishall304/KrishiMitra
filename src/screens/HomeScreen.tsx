@@ -1,22 +1,60 @@
+import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Bolt,
+  Bug,
   Building2,
   CalendarDays,
   Camera,
   ChevronRight,
+  CloudRain,
+  Droplet,
   Lightbulb,
   Newspaper,
   Sparkles,
+  Sprout,
+  TrendingUp,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { feedItems } from '../data/dummy'
+import type { FeedItem, FeedItemKind } from '../data/dummy'
 import type { TabId } from '../types'
 
-const iconMap = {
+const iconMap: Record<FeedItem['IconKey'], LucideIcon> = {
   newspaper: Newspaper,
   buildingLibrary: Building2,
   lightBulb: Lightbulb,
-} as const
+  trendingUp: TrendingUp,
+  cloudRain: CloudRain,
+  droplet: Droplet,
+  sprout: Sprout,
+  bug: Bug,
+}
+
+const kindLabel: Record<FeedItemKind, string> = {
+  news: 'Farming news',
+  scheme: 'Government scheme',
+  tips: 'Farming tip',
+  market: 'Market price',
+  weather: 'Weather alert',
+  irrigation: 'Irrigation',
+  fertilizer: 'Fertiliser',
+  pest: 'Pest advisory',
+}
+
+type Filter = 'all' | FeedItemKind
+
+const filters: { key: Filter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'weather', label: 'Weather' },
+  { key: 'market', label: 'Market' },
+  { key: 'scheme', label: 'Schemes' },
+  { key: 'tips', label: 'Tips' },
+  { key: 'news', label: 'News' },
+  { key: 'fertilizer', label: 'Fertiliser' },
+  { key: 'irrigation', label: 'Irrigation' },
+  { key: 'pest', label: 'Pest' },
+]
 
 type Props = {
   onNavigate: (tab: TabId) => void
@@ -50,6 +88,13 @@ const cardIconClass =
   'h-7 w-7 text-white transition duration-200 ease-out group-hover:scale-105 group-hover:text-white'
 
 export function HomeScreen({ onNavigate }: Props) {
+  const [filter, setFilter] = useState<Filter>('all')
+
+  const visibleItems = useMemo(
+    () => (filter === 'all' ? feedItems : feedItems.filter((i) => i.kind === filter)),
+    [filter],
+  )
+
   return (
     <div className="space-y-6 pb-28">
       <section className="space-y-3">
@@ -72,6 +117,7 @@ export function HomeScreen({ onNavigate }: Props) {
                 type="button"
                 title={action.tooltip}
                 aria-label={action.tooltip}
+                data-testid={`quick-${action.key}-btn`}
                 onClick={() => onNavigate(action.tab)}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -90,41 +136,81 @@ export function HomeScreen({ onNavigate }: Props) {
 
       <section className="space-y-3">
         <div className="flex items-center gap-2 px-1">
-          <Bolt className="h-5 w-5 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} />
+          <Bolt
+            className="h-5 w-5 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700"
+            strokeWidth={2}
+          />
           <h3 className="text-lg font-bold text-slate-900">Info feed</h3>
+          <span className="ml-auto text-xs font-medium text-slate-500">
+            {visibleItems.length} {visibleItems.length === 1 ? 'post' : 'posts'}
+          </span>
         </div>
-        <div className="flex max-h-[min(52vh,420px)] flex-col gap-3 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch]">
-          {feedItems.map((item, i) => {
-            const Icon = iconMap[item.IconKey]
+
+        {/* Horizontal filter chips — let the page scroll vertically */}
+        <div
+          className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none]"
+          style={{ scrollbarWidth: 'none' }}
+          data-testid="feed-filters"
+        >
+          {filters.map((f) => {
+            const active = filter === f.key
             return (
-              <motion.article
-                key={item.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 + i * 0.05 }}
-                className="flex gap-3 rounded-2xl border border-green-100 bg-white p-4 shadow-md shadow-green-900/5"
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => setFilter(f.key)}
+                data-testid={`feed-filter-${f.key}`}
+                className={[
+                  'shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition duration-200 ease-out',
+                  active
+                    ? 'bg-green-600 text-white shadow-sm ring-1 ring-green-700'
+                    : 'bg-white text-slate-600 ring-1 ring-green-100 hover:scale-[1.02] hover:bg-green-50 hover:text-green-800',
+                ].join(' ')}
               >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-green-100 transition duration-200 ease-out hover:scale-105 hover:bg-green-100 hover:text-green-800">
-                  <Icon className="h-7 w-7" strokeWidth={2} aria-hidden />
-                </div>
-                <div className="min-w-0 flex-1 text-left">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
-                    {item.kind === 'news' && 'Farming news'}
-                    {item.kind === 'scheme' && 'Government schemes'}
-                    {item.kind === 'tips' && 'Farming tips'}
-                  </p>
-                  <h4 className="mt-1 font-semibold leading-snug text-slate-900">{item.title}</h4>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
-                </div>
-                <ChevronRight
-                  className="mt-1 h-6 w-6 shrink-0 self-center text-slate-300 transition duration-200 ease-out hover:scale-105 hover:text-green-600"
-                  strokeWidth={2}
-                  aria-hidden
-                />
-              </motion.article>
+                {f.label}
+              </button>
             )
           })}
         </div>
+
+        {visibleItems.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-green-200 bg-white p-6 text-center">
+            <p className="text-sm text-slate-600">No posts in this category yet.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3" data-testid="feed-list">
+            {visibleItems.map((item, i) => {
+              const Icon = iconMap[item.IconKey]
+              return (
+                <motion.article
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i, 6) * 0.04 }}
+                  className="flex gap-3 rounded-2xl border border-green-100 bg-white p-4 shadow-md shadow-green-900/5 transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-green-100 transition duration-200 ease-out hover:scale-105 hover:bg-green-100 hover:text-green-800">
+                    <Icon className="h-7 w-7" strokeWidth={2} aria-hidden />
+                  </div>
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
+                      {kindLabel[item.kind]}
+                      {item.meta ? <span className="ml-2 text-slate-400">· {item.meta}</span> : null}
+                    </p>
+                    <h4 className="mt-1 font-semibold leading-snug text-slate-900">{item.title}</h4>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                  </div>
+                  <ChevronRight
+                    className="mt-1 h-6 w-6 shrink-0 self-center text-slate-300 transition duration-200 ease-out hover:scale-105 hover:text-green-600"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                </motion.article>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       <motion.button
@@ -132,6 +218,7 @@ export function HomeScreen({ onNavigate }: Props) {
         onClick={() => onNavigate('ai')}
         title="Ask AI"
         aria-label="Ask AI"
+        data-testid="home-ask-ai-fab"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
