@@ -47,7 +47,7 @@
 - Hindi / Marathi / English AI replies
 - Graceful fallback when AI provider is unreachable
 
-## What's been implemented (as of 2026-04-21)
+## What's been implemented (as of 2026-04-24)
 
 ### Iteration 1 — Wire-up & audit
 - Cloned repo into `/app`, bridged Vite to supervisor via `/app/frontend/package.json` shim (port 3000).
@@ -72,9 +72,15 @@
 - `yarn build` passes (Vercel-ready).
 - Verified 7/7 backend pytest pass; real LLM replies in en/hi/mr on the live preview.
 
-### Testing status
-- **Backend (`/api/ai/chat`, `/api/`, `/api/weather`)**: 100% pytest pass.
-- **Frontend**: auth + session + nav + home + AI real-LLM flow + typing indicator + multi-language all verified live.
+### Iteration 3 (polish) — Feed, voice, weather-aware AI
+- **Home feed expanded** to 12 diverse dummy posts across 8 kinds: `news`, `scheme`, `tips`, `market`, `weather`, `irrigation`, `fertilizer`, `pest`. Added horizontal category filter chips and swapped nested scroll for natural page-level scroll. New `FeedItem` type + icon map with `TrendingUp / CloudRain / Droplet / Sprout / Bug` lucide icons.
+- **Real voice input** via `useSpeechRecognition` hook wrapping the browser Web Speech API. Works on Chromium / Edge / most mobile browsers without any API key. Language hint follows the farmer's preferred language (`hi-IN` / `mr-IN` / `en-IN`). Idle / listening / error / unsupported states surfaced via the mic button (pill becomes red + pulses while listening). Graceful unsupported state (button disabled, helpful tooltip) — no crashes on Safari desktop.
+- **Weather-aware AI**: before sending a chat message, the client prepends the current weather snapshot (`Current weather near farmer: Pune Region, 32°C, Partly cloudy, humidity 58%, rain chance 30%.`) so the LLM can give weather-sensitive advice. Verified in iteration_4 by intercepting the outgoing POST body and confirming the LLM actually references the weather in its reply.
+- Verified: `yarn tsc --noEmit` exit 0, `yarn build` exit 0, iteration_4 testing pass on all new surfaces (feed filters, 12 items, 8 kinds, page scroll, voice button state, weather injection, Hindi Devanagari reply, 5-tab nav, ProtectedRoute regression hold).
+
+### Testing status (iteration_4)
+- **Backend**: 7/7 pytest pass.
+- **Frontend**: 100% pass on the polish iteration — home feed, filters, voice button, weather injection, Hindi reply, no regressions.
 
 ## Known blockers (external — not code)
 - 🔶 **Firestore rules on project `krishix-eaccb` still deny `activities`, `reminders`, `cropDetections`, `chatHistory`** until the user runs `firebase deploy --only firestore:rules,firestore:indexes,storage`. The rules file is already authored and correct.
