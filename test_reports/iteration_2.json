@@ -1,0 +1,73 @@
+{
+  "summary": "Frontend E2E testing of KrishiMitra/AgriSathi (Vite+React+Firebase). Auth signup + session persistence + AI chat + Profile load + bottom-nav-icons-only all PASS. Home screen, quick actions, info feed, Ask-AI FAB routing all PASS. CRITICAL BLOCKER: Firebase Firestore security rules on project krishix-eaccb deny read/write to collections `activities`, `reminders`, `cropDetections` even for the owning authenticated user -> Tracker activity CRUD, Reminder CRUD, and Crop Detection history/save are non-functional (user sees 'Missing or insufficient permissions.' banner and console throws FirebaseError). The code logic itself (userId filtering, service calls, UI modals, preset dropdowns, date/status/notes, lucide icons, 5-tab icon-only nav) is correctly implemented; the blocker is in Firebase rules configuration, not the React code.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "Firestore:activities (listActivitiesForUser / addActivity / updateActivity / deleteActivity)",
+        "issue": "FirebaseError: Missing or insufficient permissions on every read and write. Security rules on project krishix-eaccb do not allow authenticated user to access own docs.",
+        "priority": "CRITICAL"
+      },
+      {
+        "endpoint": "Firestore:reminders (listReminders / add / update / delete)",
+        "issue": "FirebaseError: Missing or insufficient permissions. Same security-rule issue.",
+        "priority": "CRITICAL"
+      },
+      {
+        "endpoint": "Firestore:cropDetections (listDetections / saveDetection)",
+        "issue": "FirebaseError: Missing or insufficient permissions. Blocks Detect screen history and save-after-analyze.",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "Firebase Auth - provided test user",
+        "issue": "Credential in /app/memory/test_credentials.md (krishi_1776759291@test.com / Password@123) returns 400 INVALID_LOGIN_CREDENTIALS from Firebase. Either the account was deleted or password rotated. Please update test_credentials.md with a working user or re-seed the account."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Tracker Add/Edit/Delete activity", "issue": "UI renders, Save activity button exists, but underlying Firestore write is denied by rules; user never sees success.", "affected_selectors": ["button[aria-label='Add activity']", "button:has-text('Save activity')"]},
+      {"flow": "Reminders CRUD", "issue": "Add-reminder button opens modal, but list fetch + writes fail with permissions error.", "affected_selectors": ["[aria-label*='reminder']"]},
+      {"flow": "Detect crop upload+save", "issue": "History list fetch fails on mount ('Missing or insufficient permissions.' banner under screen title). Post-analyze save to cropDetections also blocked.", "affected_selectors": ["input[type=file]"]}
+    ],
+    "design_issues": [
+      {"screen": "Tracker & Detect", "issues": ["Raw backend error string 'Missing or insufficient permissions.' leaked to UI as alert banner instead of a friendlier message. Good fallback, but consider wrapping in formatAuthError-style helper."]}
+    ]
+  },
+  "passed_tests": [
+    "Signup creates Firebase Auth user AND users/{uid} Firestore doc (verified in console log '[AgriSathi][Firestore][users] Document created')",
+    "Invalid login shows friendly 'Invalid email or password.' banner from formatAuthError (no crash)",
+    "Session persists across hard reload (onAuthStateChanged keeps nav + home)",
+    "BottomNav renders exactly 5 buttons (Home, Detect crop, AI assistant, Activity tracker, Profile) - all icon-only (hasText=false, hasSvg=true) with aria-label/title for a11y",
+    "Home screen shows quick-action trio + 3 info-feed cards (FARMING NEWS, GOVERNMENT SCHEMES, FARMING TIPS) + Ask-AI FAB (Sparkles) and FAB click routes to AI tab",
+    "AI screen renders welcome bubble; user message appears; mock assistant reply appears ~450ms later ('Thanks! This is a demo reply...'); chat persists (no FirebaseError for chatHistory)",
+    "AI screen shows multi-language indicators: 'English', 'मराठी' present (note: 'Hindi' label in Latin script rather than 'हिंदी' Devanagari)",
+    "Profile pre-fills Full name/Phone/Village/District/State/Preferred language from Firestore users/{uid} doc",
+    "Profile Add activity modal opens with preset dropdown (Irrigation done / Fertilizer added / Spray completed), native date picker, status select, notes field, Save button",
+    "No emojis in UI; all icons are lucide-react SVGs"
+  ],
+  "test_report_links": [],
+  "action_items": [
+    "HIGH: Update Firestore security rules on Firebase project `krishix-eaccb` to allow authenticated users to read/write their own documents in `activities`, `reminders`, `cropDetections` (and confirm `chatHistory`, `users` continue to work). Example rule: match /activities/{doc} { allow read, write: if request.auth != null && request.auth.uid == resource.data.userId; }. Same for reminders/cropDetections. For create: allow create: if request.auth != null && request.auth.uid == request.resource.data.userId.",
+    "HIGH: Verify Firebase Storage rules also allow profileImages/{uid}/** and crop image uploads for the authenticated user (could not be exercised because Firestore save is blocked, but expect same misconfiguration).",
+    "MEDIUM: Refresh /app/memory/test_credentials.md with a working Firebase test user (current krishi_1776759291@test.com fails with 400 INVALID_LOGIN_CREDENTIALS). Recommend re-running seed script or creating a fresh fixture user.",
+    "LOW: Consider showing user-friendly message ('Could not load, please retry') instead of raw 'Missing or insufficient permissions.' on Tracker/Detect screens when Firestore fetch fails.",
+    "LOW: AI assistant language chip shows 'Hindi' in Latin script; earlier PRD hint was 'हिंदी' Devanagari. Align if user wants all three Indic scripts."
+  ],
+  "critical_code_review_comments": [
+    "Detect/Tracker screens correctly filter by userId and handle error states with banner - good.",
+    "AuthContext chat/write paths are structurally fine; failures are purely rule-side.",
+    "BottomNav: icon-only with aria-label = label name - good for a11y + testing.",
+    "No data-testid attributes anywhere in the app. Relying on IDs (#login-email, #su-*) and aria-label is workable but adding data-testid on primary interactive elements (FAB, save buttons, nav tabs, modal inputs) would make future automation more resilient."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (Firebase-hosted; no custom backend)", "frontend": "60% - auth + nav + home + AI + profile load work; tracker/reminders/detect blocked by Firestore rules"},
+  "test_credentials": "Existing credential in /app/memory/test_credentials.md DOES NOT work (400 from Firebase). Created new working user during this run: tester_1776759559@test.com / Password@123. Main agent should add this (or a fresh one) to test_credentials.md.",
+  "seed_data_creation": "Signed up a new user tester_1776759559@test.com through the UI; users/{uid} doc successfully created in Firestore.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "The React code itself is solid. If Firebase rules on project krishix-eaccb are fixed by main agent, re-run tracker activity/reminder CRUD, crop detection upload+history, and profile photo upload end-to-end. Use signup flow with a unique email per run (tester_{timestamp}@test.com / Password@123). Key selectors: #login-email, #login-password, #su-name, #su-phone, #su-email, #su-pass, #su-village, #su-district, #su-state, #su-lang (HTML select), nav[aria-label='Primary'] button[aria-label='Home'|'Detect crop'|'AI assistant'|'Activity tracker'|'Profile'], button[aria-label='Add activity'] on Tracker. Tracker modal has native <select> + <input type=date> (no shadcn calendar). Profile logout icon is inside the profile header button row (next to camera/avatar).",
+  "rca_of_the_issue": "ROOT CAUSE: Firestore security rules on project krishix-eaccb deny read/write to 3 collections (activities, reminders, cropDetections) even when request.auth.uid matches the doc's userId field. Evidence: repeated 'FirebaseError: Missing or insufficient permissions' in browser console on TrackerScreen refresh, DetectScreen load history, etc., while writes to `users` and `chatHistory` succeed (console shows 'Document created' for users). REPRODUCTION: 1) Sign up a new user through /signup. 2) Navigate to Activity tracker or Detect crop - see red 'Missing or insufficient permissions.' banner. MITIGATION: Deploy Firestore rules that allow owner-read/write on those 3 collections. After fix, re-test CRUD flows."
+}

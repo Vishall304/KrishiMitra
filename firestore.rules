@@ -1,0 +1,69 @@
+rules_version = '2';
+
+// Firestore security rules for KrishiMitra / AgriSathi.
+//
+// Deploy with:
+//   firebase deploy --only firestore:rules
+//
+// Rules require that the caller is signed in and that their uid matches
+// the document's `userId` field (or, for /users/{uid}, the document id).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Helpers ----
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwnerOfField(data) {
+      return isSignedIn() && data.userId == request.auth.uid;
+    }
+
+    // ---- users/{uid} : one doc per user, id == uid ----
+    match /users/{uid} {
+      allow read:   if isSignedIn() && request.auth.uid == uid;
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if false; // never delete via client
+    }
+
+    // ---- activities ----
+    match /activities/{id} {
+      allow read:   if isSignedIn() && isOwnerOfField(resource.data);
+      allow create: if isSignedIn() && isOwnerOfField(request.resource.data);
+      allow update: if isSignedIn() && isOwnerOfField(resource.data)
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if isSignedIn() && isOwnerOfField(resource.data);
+    }
+
+    // ---- reminders ----
+    match /reminders/{id} {
+      allow read:   if isSignedIn() && isOwnerOfField(resource.data);
+      allow create: if isSignedIn() && isOwnerOfField(request.resource.data);
+      allow update: if isSignedIn() && isOwnerOfField(resource.data)
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if isSignedIn() && isOwnerOfField(resource.data);
+    }
+
+    // ---- cropDetections ----
+    match /cropDetections/{id} {
+      allow read:   if isSignedIn() && isOwnerOfField(resource.data);
+      allow create: if isSignedIn() && isOwnerOfField(request.resource.data);
+      allow update: if false; // detections are immutable once saved
+      allow delete: if isSignedIn() && isOwnerOfField(resource.data);
+    }
+
+    // ---- chatHistory ----
+    match /chatHistory/{id} {
+      allow read:   if isSignedIn() && isOwnerOfField(resource.data);
+      allow create: if isSignedIn() && isOwnerOfField(request.resource.data);
+      allow update: if false;
+      allow delete: if isSignedIn() && isOwnerOfField(resource.data);
+    }
+
+    // Default deny on everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,5 @@
+export const USERS = 'users'
+export const CROP_DETECTIONS = 'cropDetections'
+export const ACTIVITIES = 'activities'
+export const REMINDERS = 'reminders'
+export const CHAT_HISTORY = 'chatHistory'

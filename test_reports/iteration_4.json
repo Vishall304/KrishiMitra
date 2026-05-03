@@ -1,0 +1,51 @@
+{
+  "summary": "Iteration 4 (polish) — 100% green on all new surfaces. Backend pytest 7/7 pass on /app/backend/tests/test_krishimitra_ai.py (health, en/hi/mr chat w/ source='llm', 422 on empty, multi-turn context, /api/weather mock). Frontend: fresh signup with preferredLanguage='हिंदी' as polish_1777039370@test.com/Password@123. Home feed renders exactly 12 dummy posts spanning ALL 8 kinds (WEATHER ALERT, MARKET PRICE, FARMING NEWS, GOVERNMENT SCHEME, FERTILISER, IRRIGATION, PEST ADVISORY, FARMING TIP) — every kind badge appears. Filter chip test: clicking [data-testid=feed-filter-market] reduced visible articles from 12 → 2; [data-testid=feed-filter-all] restored to 12. feed-list getComputedStyle shows maxHeight='none' and overflowY='visible' (true page-level scroll); window.scrollY reached 2124 of 3024 docHeight with 900 viewport — full vertical scroll and FAB ([data-testid=home-ask-ai-fab]) stays fixed and visible over scrolled content. Bottom nav has exactly 5 data-testid icon tabs. AI navigation: after 10s settle, clicking [data-testid=nav-ai-btn] loaded AIScreen and it STAYED (no snap back to home during 15s+ of subsequent interaction). Voice button [data-testid=ai-voice-btn]: on Chromium supported=true (disabled=false, aria-pressed='false', title='Speak your question'); clicking it produced zero pageerrors and no amber error banner. Weather context injection VERIFIED via page.on('request') capture: outgoing POST /api/ai/chat body starts with 'Current weather near farmer: Pune Region, 32°C, Partly cloudy, humidity 58%, rain chance 30%.\\n\\nShould I irrigate tomato today?' — exact requirement met. Hindi reply came back in Devanagari with bubble label 'KRISHIMITRA' (source='llm', not 'Offline'). Build hygiene: `yarn tsc --noEmit -p tsconfig.app.json` exit 0; `yarn build` exit 0 emitted dist/assets/index-DfMDlMXB.js (813 kB) + index-D9Bpg_Eu.css. ProtectedRoute iteration-3 regression held — no tab snap-back observed this run. Known-and-scoped-out: Firestore chatHistory writes still deny ('Missing or insufficient permissions') — expected per review request ('rules not deployed on krishix-eaccb').",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "pytest 7/7 on /api/ health + /api/ai/chat (en/hi/mr/empty/history) + /api/weather",
+    "yarn tsc --noEmit -p tsconfig.app.json -> exit 0",
+    "yarn build -> exit 0, dist/assets/index-DfMDlMXB.js emitted",
+    "Signup with preferredLanguage=हिंदी completed; landed on home with 5 data-testid nav tabs",
+    "Home feed = 12 articles; distinct kind badges seen: WEATHER ALERT, MARKET PRICE, FARMING NEWS, GOVERNMENT SCHEME, FERTILISER, IRRIGATION, PEST ADVISORY, FARMING TIP (all 8 kinds)",
+    "feed-filter-market -> 2 articles; feed-filter-all -> 12 articles",
+    "feed-list maxHeight='none' overflowY='visible' (natural page scroll, no nested scroll container)",
+    "Page scrolls past feed; window.scrollY=2124 of docH=3024 at 900-tall viewport",
+    "home-ask-ai-fab fixed and visible over scrolled content",
+    "nav-ai-btn click after 10s kept AIScreen mounted (no ProtectedRoute snap-back)",
+    "ai-voice-btn: supported in Chromium — disabled=false, aria-pressed='false' idle; click produced 0 page errors and no amber banner",
+    "POST /api/ai/chat outgoing body contains 'Current weather near farmer: Pune Region, 32°C, Partly cloudy, humidity 58%, rain chance 30%.' BEFORE the user question (weather-context injection verified via request interception)",
+    "Hindi response rendered in Devanagari with bubble label 'KRISHIMITRA' (source='llm', not 'Offline')",
+    "Nav back to home after AI works; feed-list re-renders"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_krishimitra_ai.py",
+    "/app/test_reports/pytest/iteration_4.xml"
+  ],
+  "action_items": [
+    "NO NEW ACTION ITEMS from this iteration. All polish-iteration requirements verified.",
+    "(Carry-over, external) Deploy /app/firestore.rules so chatHistory / activities / reminders / cropDetections writes stop denying — unchanged from iteration 3. Console still shows 2x '[AIScreen] load history FirebaseError: Missing or insufficient permissions.' and 1x '[AIScreen] saveChatTurn FirebaseError' per session. Chat UX is unaffected because aiService catches these — only persistence is blocked."
+  ],
+  "critical_code_review_comments": [
+    "src/screens/AIScreen.tsx weatherLine() correctly produces the exact prefix 'Current weather near farmer:' that the test spec asks for; fetchWeather() is mock-sourced so body is deterministic and safe for tests — good.",
+    "src/hooks/useSpeechRecognition.ts: clean SpeechRecognition wrapper, webkit fallback, proper abort on unmount, error codes mapped to user-friendly strings. Good handling of unsupported case via status='unsupported' + supported=false. No issues.",
+    "src/screens/HomeScreen.tsx: feed-list uses flex-col with no max-height/overflow so page-level scroll works as intended; filter chips are horizontally scrollable independent of the vertical list. 12 dummy items cover 8 kinds — matches spec.",
+    "Bundle size warning (>500 kB) from vite — not a blocker but worth lazy-loading AIScreen / DetectScreen with React.lazy in a future iteration.",
+    "No changes required in backend/server.py or api/chat.py; iteration 3 verdict holds."
+  ],
+  "updated_files": [
+    "/app/test_reports/iteration_4.json (new)",
+    "/app/test_reports/pytest/iteration_4.xml (new)"
+  ],
+  "success_rate": {"backend": "100% (7/7 pytest)", "frontend": "100% on iteration-4 polish surfaces (feed, filters, scroll, voice btn, weather context, Hindi reply, 5-tab nav, ProtectedRoute hold, build+tsc)"},
+  "test_credentials": "Signed up polish_1777039370@test.com / Password@123 (Firebase live). EMERGENT_LLM_KEY present server-side (not logged).",
+  "seed_data_creation": "1 Firebase user created: polish_1777039370@test.com (preferredLanguage=हिंदी) plus users/{uid} Firestore doc. One polish_1777039295@test.com was attempted earlier in the run but signup did not complete (aborted before submit).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Signup field IDs are #su-name, #su-phone, #su-email, #su-pass, #su-village, #su-district, #su-state, #su-lang (select with options 'English' / 'हिंदी' / 'मराठी'). Submit is [data-testid=signup-submit-btn]. Login fields are #login-email, #login-password, [data-testid=login-submit-btn]. Entry to signup is the 'Create account' link on /login. For weather-context intercept: register `page.on('request')` BEFORE sending the AI message and filter on req.url.includes('/api/ai/chat') && req.method==='POST'; body will be JSON with a 'message' key that contains the prefix 'Current weather near farmer:'. Firestore chatHistory writes still deny; ignore — it is scoped out. Playwright Chromium DOES expose window.SpeechRecognition (voice-btn reports supported=true) but will not actually transcribe audio headlessly, so only assert enabled/aria-pressed state, not final transcript.",
+  "rca_of_the_issue": "N/A — no new defects this iteration."
+}
