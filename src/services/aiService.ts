@@ -42,7 +42,11 @@ function normaliseLang(l?: string): 'en' | 'hi' | 'mr' {
 }
 
 const AI_ENDPOINT =
+<<<<<<< HEAD
   import.meta.env.VITE_AI_ENDPOINT || "http://127.0.0.1:8001/api/ai/chat";
+=======
+  import.meta.env.VITE_AI_ENDPOINT?.toString().trim() || '/api/ai/chat'
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
 export async function sendChatMessage(req: ChatRequest): Promise<ChatResponse> {
   const language = normaliseLang(req.language)
@@ -74,7 +78,11 @@ export async function sendChatMessage(req: ChatRequest): Promise<ChatResponse> {
     }
   } catch (err) {
     if (import.meta.env.DEV) {
+<<<<<<< HEAD
       console.warn('[KrishiMitra][ai] chat request failed, using client fallback', err)
+=======
+      console.warn('[AgriSathi][ai] chat request failed, using client fallback', err)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     }
     return {
       reply: MOCK_REPLIES[language],

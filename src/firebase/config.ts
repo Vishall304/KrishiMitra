@@ -42,7 +42,11 @@ const envComplete = envLooksComplete(env)
 
 if (import.meta.env.DEV) {
   const apiKeyHint = env.apiKey ? `loaded (${env.apiKey.length} chars)` : 'MISSING or empty'
+<<<<<<< HEAD
   console.info('[KrishiMitra][firebase][dev] import.meta.env Firebase keys:', {
+=======
+  console.info('[AgriSathi][firebase][dev] import.meta.env Firebase keys:', {
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     VITE_FIREBASE_API_KEY: apiKeyHint,
     VITE_FIREBASE_AUTH_DOMAIN: env.authDomain || 'MISSING',
     VITE_FIREBASE_PROJECT_ID: env.projectId || 'MISSING',
@@ -60,7 +64,11 @@ let firebaseReady = false
 
 if (!envComplete) {
   console.warn(
+<<<<<<< HEAD
     `[KrishiMitra][firebase] Firebase environment variables are missing or empty. ${CONFIG_HELP}`,
+=======
+    `[AgriSathi][firebase] Firebase environment variables are missing or empty. ${CONFIG_HELP}`,
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
   )
 } else {
   try {
@@ -78,7 +86,11 @@ if (!envComplete) {
     storageInstance = getStorage(app)
     firebaseReady = true
   } catch (e) {
+<<<<<<< HEAD
     console.warn('[KrishiMitra][firebase] initializeApp failed (invalid config or SDK error):', e)
+=======
+    console.warn('[AgriSathi][firebase] initializeApp failed (invalid config or SDK error):', e)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     app = null
     authInstance = null
     dbInstance = null
@@ -88,14 +100,22 @@ if (!envComplete) {
 }
 
 if (!import.meta.env.DEV && !firebaseReady) {
+<<<<<<< HEAD
   console.warn('[KrishiMitra][firebase] Firebase is not initialized. Check environment configuration.')
+=======
+  console.warn('[AgriSathi][firebase] Firebase is not initialized. Check environment configuration.')
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 }
 
 export { firebaseReady }
 
 export function getFirebaseAuth(): Auth {
   if (!authInstance) {
+<<<<<<< HEAD
     console.warn('[KrishiMitra][firebase] Auth is not available.', CONFIG_HELP)
+=======
+    console.warn('[AgriSathi][firebase] Auth is not available.', CONFIG_HELP)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     throw new Error('Firebase Auth is not configured.')
   }
   return authInstance
@@ -103,7 +123,11 @@ export function getFirebaseAuth(): Auth {
 
 export function getFirestoreDb(): Firestore {
   if (!dbInstance) {
+<<<<<<< HEAD
     console.warn('[KrishiMitra][firebase] Firestore is not available.', CONFIG_HELP)
+=======
+    console.warn('[AgriSathi][firebase] Firestore is not available.', CONFIG_HELP)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     throw new Error('Firebase Firestore is not configured.')
   }
   return dbInstance
@@ -111,7 +135,11 @@ export function getFirestoreDb(): Firestore {
 
 export function getFirebaseStorage(): FirebaseStorage {
   if (!storageInstance) {
+<<<<<<< HEAD
     console.warn('[KrishiMitra][firebase] Storage is not available.', CONFIG_HELP)
+=======
+    console.warn('[AgriSathi][firebase] Storage is not available.', CONFIG_HELP)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     throw new Error('Firebase Storage is not configured.')
   }
   return storageInstance

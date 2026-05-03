@@ -43,7 +43,11 @@ export function LoginScreen() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
         <header className="text-center">
           <p className="flex items-center justify-center gap-1.5 text-2xl font-bold text-green-700">
+<<<<<<< HEAD
             KrishiMitra
+=======
+            AgriSathi
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
             <Leaf className="h-7 w-7 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} aria-hidden />
           </p>
           <h1 className="mt-2 text-xl font-bold text-slate-900">Farmer login</h1>

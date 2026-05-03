@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
@@ -79,6 +80,27 @@ const filters: { key: Filter; label: string }[] = [
   { key: 'pest', label: 'Pest' },
   { key: 'disease', label: 'Disease' },
 ]
+=======
+import { motion } from 'framer-motion'
+import {
+  Bolt,
+  Building2,
+  CalendarDays,
+  Camera,
+  ChevronRight,
+  Lightbulb,
+  Newspaper,
+  Sparkles,
+} from 'lucide-react'
+import { feedItems } from '../data/dummy'
+import type { TabId } from '../types'
+
+const iconMap = {
+  newspaper: Newspaper,
+  buildingLibrary: Building2,
+  lightBulb: Lightbulb,
+} as const
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
 type Props = {
   onNavigate: (tab: TabId) => void
@@ -87,7 +109,10 @@ type Props = {
 const quickActions = [
   {
     key: 'detect',
+<<<<<<< HEAD
     label: 'Detect crop',
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     tooltip: 'Detect crop — photo-based crop check',
     Icon: Camera,
     tab: 'detect' as TabId,
@@ -95,15 +120,22 @@ const quickActions = [
   },
   {
     key: 'ai',
+<<<<<<< HEAD
     label: 'Ask AI',
     tooltip: 'Ask AI — chat or speak in your language',
+=======
+    tooltip: 'Ask AI — chat in your language',
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     Icon: Sparkles,
     tab: 'ai' as TabId,
     gradient: 'from-emerald-600 to-green-700',
   },
   {
     key: 'reminder',
+<<<<<<< HEAD
     label: 'Reminder',
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     tooltip: 'Set reminder — irrigation and field tasks',
     Icon: CalendarDays,
     tab: 'tracker' as TabId,
@@ -111,6 +143,7 @@ const quickActions = [
   },
 ]
 
+<<<<<<< HEAD
 function FeedCard({ item, index }: { item: FeedItem; index: number }) {
   const Icon = iconMap[item.IconKey]
   const [liked, setLiked] = useState(false)
@@ -225,6 +258,12 @@ export function HomeScreen({ onNavigate }: Props) {
     [filter],
   )
 
+=======
+const cardIconClass =
+  'h-7 w-7 text-white transition duration-200 ease-out group-hover:scale-105 group-hover:text-white'
+
+export function HomeScreen({ onNavigate }: Props) {
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
   return (
     <div className="space-y-6 pb-28">
       <section className="space-y-3">
@@ -247,18 +286,29 @@ export function HomeScreen({ onNavigate }: Props) {
                 type="button"
                 title={action.tooltip}
                 aria-label={action.tooltip}
+<<<<<<< HEAD
                 data-testid={`quick-${action.key}-btn`}
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
                 onClick={() => onNavigate(action.tab)}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.985 }}
+<<<<<<< HEAD
                 className={`group flex flex-col items-center gap-2 rounded-3xl bg-gradient-to-br ${action.gradient} p-4 text-white shadow-lg shadow-green-900/15 ring-1 ring-white/20 transition duration-200 ease-out hover:brightness-110`}
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
                   <Icon className="h-6 w-6" strokeWidth={2} aria-hidden />
                 </span>
                 <span className="text-xs font-semibold">{action.label}</span>
+=======
+                className={`group flex aspect-square max-h-[120px] flex-col items-center justify-center rounded-3xl bg-gradient-to-br ${action.gradient} p-4 text-white shadow-lg shadow-green-900/15 ring-1 ring-white/20 transition duration-200 ease-out hover:brightness-110 sm:aspect-auto sm:min-h-[104px]`}
+              >
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                  <Icon className={cardIconClass} strokeWidth={2} aria-hidden />
+                </span>
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
               </motion.button>
             )
           })}
@@ -267,6 +317,7 @@ export function HomeScreen({ onNavigate }: Props) {
 
       <section className="space-y-3">
         <div className="flex items-center gap-2 px-1">
+<<<<<<< HEAD
           <Bolt className="h-5 w-5 text-green-600" strokeWidth={2} aria-hidden />
           <h3 className="text-lg font-bold text-slate-900">Kisan feed</h3>
           <span className="ml-auto text-xs font-medium text-slate-500">
@@ -311,6 +362,43 @@ export function HomeScreen({ onNavigate }: Props) {
             ))}
           </div>
         )}
+=======
+          <Bolt className="h-5 w-5 text-green-600 transition duration-200 ease-out hover:scale-105 hover:text-green-700" strokeWidth={2} />
+          <h3 className="text-lg font-bold text-slate-900">Info feed</h3>
+        </div>
+        <div className="flex max-h-[min(52vh,420px)] flex-col gap-3 overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch]">
+          {feedItems.map((item, i) => {
+            const Icon = iconMap[item.IconKey]
+            return (
+              <motion.article
+                key={item.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.05 }}
+                className="flex gap-3 rounded-2xl border border-green-100 bg-white p-4 shadow-md shadow-green-900/5"
+              >
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-700 ring-1 ring-green-100 transition duration-200 ease-out hover:scale-105 hover:bg-green-100 hover:text-green-800">
+                  <Icon className="h-7 w-7" strokeWidth={2} aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
+                    {item.kind === 'news' && 'Farming news'}
+                    {item.kind === 'scheme' && 'Government schemes'}
+                    {item.kind === 'tips' && 'Farming tips'}
+                  </p>
+                  <h4 className="mt-1 font-semibold leading-snug text-slate-900">{item.title}</h4>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                </div>
+                <ChevronRight
+                  className="mt-1 h-6 w-6 shrink-0 self-center text-slate-300 transition duration-200 ease-out hover:scale-105 hover:text-green-600"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+              </motion.article>
+            )
+          })}
+        </div>
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
       </section>
 
       <motion.button
@@ -318,7 +406,10 @@ export function HomeScreen({ onNavigate }: Props) {
         onClick={() => onNavigate('ai')}
         title="Ask AI"
         aria-label="Ask AI"
+<<<<<<< HEAD
         data-testid="home-ask-ai-fab"
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}

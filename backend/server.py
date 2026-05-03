@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 """
 KrishiMitra / AgriSathi backend.
 
@@ -8,6 +11,7 @@ Purpose: expose `/api/ai/chat` for the React frontend's AI assistant.
 - Gracefully falls back to a local mock when the key is missing or the provider errors.
 - Chat history is stored in Firestore by the frontend; this service is stateless.
 """
+<<<<<<< HEAD
 from __future__ import annotations 
 import os
 import uuid
@@ -17,6 +21,21 @@ from fastapi import APIRouter, FastAPI, HTTPException, UploadFile, File, Form
 import json
 from typing import Literal, Optional
 from dotenv import load_dotenv
+=======
+
+from __future__ import annotations
+
+import logging
+import os
+import uuid
+from typing import Literal, Optional
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from fastapi import APIRouter, FastAPI, HTTPException
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -30,6 +49,7 @@ logger = logging.getLogger("krishimitra")
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
+<<<<<<< HEAD
 load_dotenv()
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
@@ -41,6 +61,13 @@ CORS_ORIGINS = [
 ]
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
+=======
+
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "").strip()
+DEFAULT_MODEL_PROVIDER = os.environ.get("AI_PROVIDER", "gemini")
+DEFAULT_MODEL_NAME = os.environ.get("AI_MODEL", "gemini-2.5-flash")
+CORS_ORIGINS = [o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()]
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
 
 # ---------------------------------------------------------------------------
@@ -132,6 +159,7 @@ class ChatResponse(BaseModel):
     session_id: str
     source: Literal["llm", "fallback"]
 
+<<<<<<< HEAD
 class DiseaseAnalysisResponse(BaseModel):
     crop: str
     disease: str
@@ -143,11 +171,15 @@ class DiseaseAnalysisResponse(BaseModel):
     prevention: list[str]
     language: Literal["en", "hi", "mr"]
     source: Literal["llm", "fallback"]
+=======
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 # ---------------------------------------------------------------------------
 # LLM call
 # ---------------------------------------------------------------------------
 
 async def call_llm(prompt: str, language: str, session_id: str, history: list[ChatMessage]) -> str:
+<<<<<<< HEAD
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY is not configured")
 
@@ -159,12 +191,29 @@ async def call_llm(prompt: str, language: str, session_id: str, history: list[Ch
         system_instruction="You are an expert agriculture scientist. Always give detailed structured analysis."
     )
 
+=======
+    """Send one user turn to the LLM. Raises on failure so the caller can fall back."""
+    if not EMERGENT_LLM_KEY:
+        raise RuntimeError("EMERGENT_LLM_KEY is not configured")
+
+    # Lazy import so the server still boots without the package in dev.
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=session_id,
+        system_message=SYSTEM_PROMPTS[language],
+    ).with_model(DEFAULT_MODEL_PROVIDER, DEFAULT_MODEL_NAME)
+
+    # Prepend prior turns as a short transcript (keeps context without exceeding budget).
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     transcript = ""
     for turn in history[-6:]:
         speaker = "User" if turn.role == "user" else "Assistant"
         transcript += f"{speaker}: {turn.content.strip()}\n"
     transcript += f"User: {prompt.strip()}"
 
+<<<<<<< HEAD
     try:
         response = model.generate_content(transcript)
         print("RAW GEMINI RESPONSE:", response)
@@ -277,6 +326,12 @@ Crop hint: {crop or "unknown"}
             ],
             "prevention": ["Maintain healthy crop conditions"],
         }
+=======
+    response = await chat.send_message(UserMessage(text=transcript))
+    return str(response).strip()
+
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 # ---------------------------------------------------------------------------
 # FastAPI app
 # ---------------------------------------------------------------------------
@@ -290,6 +345,7 @@ async def health() -> dict:
     return {
         "status": "ok",
         "service": "krishimitra-ai",
+<<<<<<< HEAD
         "llm_configured": bool(GEMINI_API_KEY),
         "model": f"gemini:{DEFAULT_MODEL_NAME}",
     }
@@ -305,6 +361,12 @@ async def list_models():
                 "methods": methods
             })
     return {"models": models}
+=======
+        "llm_configured": bool(EMERGENT_LLM_KEY),
+        "model": f"{DEFAULT_MODEL_PROVIDER}:{DEFAULT_MODEL_NAME}",
+    }
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
 @api_router.post("/ai/chat", response_model=ChatResponse)
 async def ai_chat(payload: ChatRequest) -> ChatResponse:
@@ -317,9 +379,14 @@ async def ai_chat(payload: ChatRequest) -> ChatResponse:
         if not reply:
             raise RuntimeError("Empty LLM response")
         source: Literal["llm", "fallback"] = "llm"
+<<<<<<< HEAD
     except Exception as exc:
         print("GEMINI ERROR:", repr(exc))
         logger.exception("LLM call failed, serving fallback")
+=======
+    except Exception as exc:  # noqa: BLE001 — we want any failure to degrade gracefully
+        logger.warning("LLM call failed, serving fallback: %s", exc)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
         reply = FALLBACK_REPLIES[language]
         source = "fallback"
 
@@ -330,6 +397,7 @@ async def ai_chat(payload: ChatRequest) -> ChatResponse:
         source=source,
     )
 
+<<<<<<< HEAD
 @api_router.post("/ai/disease", response_model=DiseaseAnalysisResponse)
 async def analyze_disease(
     image: UploadFile = File(...),
@@ -408,6 +476,9 @@ async def analyze_disease(
             language=lang,
             source="fallback",
         )
+=======
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 # ---------------------------------------------------------------------------
 # Weather placeholder (keeps the UI stable until a real provider is wired)
 # ---------------------------------------------------------------------------
@@ -449,8 +520,15 @@ app.add_middleware(
 async def _startup() -> None:
     logger.info(
         "KrishiMitra AI API ready (llm_configured=%s, model=%s:%s)",
+<<<<<<< HEAD
         bool(GEMINI_API_KEY),
         "gemini",
         DEFAULT_MODEL_NAME,
     )
 
+=======
+        bool(EMERGENT_LLM_KEY),
+        DEFAULT_MODEL_PROVIDER,
+        DEFAULT_MODEL_NAME,
+    )
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3

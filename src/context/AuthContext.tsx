@@ -69,7 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!firebaseReady) {
       console.warn(
+<<<<<<< HEAD
         '[KrishiMitra][firebase] Auth listener not started — Firebase env is missing or invalid. Fix .env.local and restart Vite.',
+=======
+        '[AgriSathi][firebase] Auth listener not started — Firebase env is missing or invalid. Fix .env.local and restart Vite.',
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
       )
       setUser(null)
       setProfile(null)

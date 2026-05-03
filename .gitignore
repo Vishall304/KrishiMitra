@@ -64,6 +64,7 @@ credentials.json
 *.pem
 *.key
 .credentials
+<<<<<<< HEAD
 -e 
 # Environment and credential files
 .env
@@ -73,3 +74,5 @@ credentials.json
 *.pem
 *.key
 .credentials
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3

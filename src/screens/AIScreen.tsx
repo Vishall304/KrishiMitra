@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+<<<<<<< HEAD
 import { Mic, MicOff, Send, Square } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
@@ -6,10 +7,18 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { fetchChatHistoryForUser, saveChatTurn } from '../services/chatHistoryService'
 import { sendChatMessage } from '../services/aiService'
 import { fetchWeather, type WeatherSnapshot } from '../services/weatherService'
+=======
+import { Mic, Send } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useAuth } from '../hooks/useAuth'
+import { fetchChatHistoryForUser, saveChatTurn } from '../services/chatHistoryService'
+import { sendChatMessage } from '../services/aiService'
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 import type { ChatHistoryRecord } from '../types/models'
 import type { ChatMessage } from '../types'
 
 const welcomeByLanguage: Record<'en' | 'hi' | 'mr', string> = {
+<<<<<<< HEAD
   en: 'Namaste! I am KrishiMitra AI. Ask about pests, fertilizer doses, sowing dates, irrigation, or mandi prices — in English, हिंदी, or मराठी.',
   hi: 'नमस्ते! मैं KrishiMitra AI हूँ। कीट, खाद की मात्रा, बुवाई का समय, सिंचाई या मंडी भाव के बारे में पूछें — हिंदी, मराठी या अंग्रेज़ी में।',
   mr: 'नमस्कार! मी KrishiMitra AI आहे. किड, खताचे प्रमाण, पेरणीची वेळ, सिंचन किंवा बाजार भावाबद्दल विचारा — मराठी, हिंदी किंवा इंग्रजीत.',
@@ -19,6 +28,11 @@ const voiceLangMap: Record<'en' | 'hi' | 'mr', string> = {
   en: 'en-IN',
   hi: 'hi-IN',
   mr: 'mr-IN',
+=======
+  en: 'Namaste! I am KrishiMitra AI. Ask about pests, fertilizer doses, sowing dates, or crop prices.',
+  hi: 'नमस्ते! मैं KrishiMitra AI हूँ। कीट, खाद की मात्रा, बुवाई का समय या फसल के दामों के बारे में पूछें।',
+  mr: 'नमस्कार! मी KrishiMitra AI आहे. किड, खताचे प्रमाण, पेरणी वेळा किंवा पिकाच्या दरांबद्दल विचारा.',
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 }
 
 function normaliseLang(l?: string): 'en' | 'hi' | 'mr' {
@@ -28,6 +42,7 @@ function normaliseLang(l?: string): 'en' | 'hi' | 'mr' {
   return 'en'
 }
 
+<<<<<<< HEAD
 function detectMessageLang(text: string, fallback: 'en' | 'hi' | 'mr'): 'en' | 'hi' | 'mr' {
   const devanagariChars = text.match(/[\u0900-\u097F]/g)?.length ?? 0
   const totalLetters = text.match(/[A-Za-z\u0900-\u097F]/g)?.length ?? 0
@@ -101,15 +116,22 @@ function languageLabel(code: 'en' | 'hi' | 'mr'): string {
   return 'English'
 }
 
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 function recordsToMessages(records: ChatHistoryRecord[]): ChatMessage[] {
   const out: ChatMessage[] = []
   for (const r of records) {
     out.push({ id: `${r.id}-u`, role: 'user', lang: r.language || 'You', text: r.userMessage })
+<<<<<<< HEAD
     out.push({ id: `${r.id}-a`, role: 'assistant', lang: 'KrishiMitra', text: r.aiResponse })
+=======
+    out.push({ id: `${r.id}-a`, role: 'assistant', lang: 'English', text: r.aiResponse })
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
   }
   return out
 }
 
+<<<<<<< HEAD
 function weatherLine(w: WeatherSnapshot): string {
   return `Current weather near farmer: ${w.place}, ${w.tempC}°C, ${w.condition}, humidity ${w.humidity}%, rain chance ${w.rainChance}%.`
 }
@@ -126,11 +148,17 @@ function weatherLine(w: WeatherSnapshot): string {
 
 //   window.speechSynthesis.speak(utterance)
 // }
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 export function AIScreen() {
   const { user, profile } = useAuth()
   const inputId = useId()
   const scrollRef = useRef<HTMLDivElement>(null)
   const langCode = normaliseLang(profile?.preferredLanguage)
+<<<<<<< HEAD
+=======
+  const langLabel = profile?.preferredLanguage ?? 'English'
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
   const welcome: ChatMessage = useMemo(
     () => ({ id: 'welcome', role: 'assistant', lang: 'KrishiMitra', text: welcomeByLanguage[langCode] }),
@@ -140,6 +168,7 @@ export function AIScreen() {
   const [messages, setMessages] = useState<ChatMessage[]>([welcome])
   const [historyLoading, setHistoryLoading] = useState(true)
   const [sending, setSending] = useState(false)
+<<<<<<< HEAD
   const [speaking, setSpeaking] = useState(false)
   const [text, setText] = useState('')
   const [weather, setWeather] = useState<WeatherSnapshot | null>(null)
@@ -168,6 +197,13 @@ export function AIScreen() {
      }
     }
   }, [])
+=======
+  const [text, setText] = useState('')
+  const sessionIdRef = useRef<string | undefined>(undefined)
+
+  const canSend = useMemo(() => text.trim().length > 0 && !sending, [text, sending])
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
   const loadHistory = useCallback(async () => {
     if (!user) return
     setHistoryLoading(true)
@@ -192,6 +228,7 @@ export function AIScreen() {
       scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
     })
   }, [])
+<<<<<<< HEAD
   const speakText = useCallback((text: string, lang: 'en' | 'hi' | 'mr') => {
   if (!('speechSynthesis' in window)) return
 
@@ -209,11 +246,14 @@ export function AIScreen() {
 
   window.speechSynthesis.speak(utterance)
 }, [])
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
   const send = useCallback(async () => {
     const t = text.trim()
     if (!t || !user || sending) return
 
+<<<<<<< HEAD
     const messageLang = detectMessageLang(t, langCode)
 
     const userMsg: ChatMessage = {
@@ -223,16 +263,24 @@ export function AIScreen() {
       text: t,
     }
 
+=======
+    const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', lang: langLabel, text: t }
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     setMessages((prev) => [...prev, userMsg])
     setText('')
     setSending(true)
     scrollToBottom()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     try {
       const lastSix = [...messages.slice(-6), userMsg].map((m) => ({
         role: m.role,
         content: m.text,
       }))
+<<<<<<< HEAD
 
       const contextPrefix = weather ? `${weatherLine(weather)}\n` : ''
       const enrichedMessage = contextPrefix ? `${contextPrefix}\n${t}` : t
@@ -256,15 +304,39 @@ export function AIScreen() {
       setMessages((prev) => [...prev, assistantMsg])
       scrollToBottom()
       speakText(res.reply, messageLang)
+=======
+      const res = await sendChatMessage({
+        message: t,
+        language: langLabel,
+        sessionId: sessionIdRef.current,
+        history: lastSix.slice(0, -1),
+      })
+      sessionIdRef.current = res.sessionId
+
+      const assistantMsg: ChatMessage = {
+        id: `a-${Date.now()}`,
+        role: 'assistant',
+        lang: res.source === 'llm' ? 'KrishiMitra' : 'Offline',
+        text: res.reply,
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+      scrollToBottom()
+
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
       void saveChatTurn({
         userId: user.uid,
         userMessage: t,
         aiResponse: res.reply,
+<<<<<<< HEAD
         language: messageLang,
+=======
+        language: langLabel,
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
       }).catch((e) => import.meta.env.DEV && console.error('[AIScreen] saveChatTurn', e))
     } finally {
       setSending(false)
     }
+<<<<<<< HEAD
   }, [text, user, sending, langCode, messages, scrollToBottom, weather])
 
   const toggleVoice = useCallback(() => {
@@ -287,12 +359,16 @@ export function AIScreen() {
   })()
 
   const MicIcon = voice.supported ? (voice.status === 'listening' ? Square : Mic) : MicOff
+=======
+  }, [text, user, sending, langLabel, messages, scrollToBottom])
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
   return (
     <div className="flex min-h-[calc(100dvh-8rem)] flex-col pb-28 pt-2">
       <div className="mb-3 rounded-3xl border border-green-100 bg-white px-4 py-3 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-wide text-green-700">AI assistant</p>
         <p className="text-sm text-slate-600">
+<<<<<<< HEAD
           English · हिंदी · मराठी — tap the mic to speak, or type your question. Chats are saved to your account.
         </p>
         {voice.error && (
@@ -300,6 +376,10 @@ export function AIScreen() {
             {voice.error}
           </p>
         )}
+=======
+          English · हिंदी · मराठी — ask any farming question. Chats are saved to your account.
+        </p>
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
         {historyLoading && <p className="mt-1 text-xs text-slate-500">Loading your past chats…</p>}
       </div>
 
@@ -337,7 +417,11 @@ export function AIScreen() {
           </motion.div>
         ))}
         {sending && (
+<<<<<<< HEAD
           <div className="flex justify-start" data-testid="ai-typing-indicator">
+=======
+          <div className="flex justify-start">
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
             <div className="rounded-2xl rounded-bl-md border border-green-100 bg-white px-4 py-3 text-slate-500 shadow-sm">
               <span className="inline-flex gap-1">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
@@ -347,6 +431,7 @@ export function AIScreen() {
             </div>
           </div>
         )}
+<<<<<<< HEAD
         {speaking && (
           <div className="flex justify-start" data-testid="ai-speaking-indicator">
             <div className="rounded-2xl rounded-bl-md border border-green-100 bg-white px-4 py-2 text-sm font-medium text-green-700 shadow-sm">
@@ -354,6 +439,8 @@ export function AIScreen() {
             </div>
           </div>
         )}
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
       </div>
 
       <div className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 mx-auto max-w-lg px-3">
@@ -364,7 +451,11 @@ export function AIScreen() {
           <textarea
             id={inputId}
             rows={1}
+<<<<<<< HEAD
             value={voice.status === 'listening' && voice.interim ? `${text} ${voice.interim}`.trim() : text}
+=======
+            value={text}
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -372,17 +463,22 @@ export function AIScreen() {
                 void send()
               }
             }}
+<<<<<<< HEAD
             placeholder={
               voice.status === 'listening'
                 ? 'Listening…'
                 : 'Message… / संदेश… / संदेश…'
             }
             readOnly={voice.status === 'listening'}
+=======
+            placeholder="Message… / संदेश… / संदेश…"
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
             data-testid="ai-input"
             className="max-h-28 min-h-[48px] flex-1 resize-none rounded-2xl bg-slate-50 px-3 py-3 text-base text-slate-900 outline-none ring-0 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-green-500"
           />
           <button
             type="button"
+<<<<<<< HEAD
             onClick={toggleVoice}
             disabled={!voice.supported}
             title={
@@ -400,6 +496,14 @@ export function AIScreen() {
             className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition duration-200 ease-out ${micButtonClass}`}
           >
             <MicIcon className="h-6 w-6" strokeWidth={2} aria-hidden />
+=======
+            title="Voice input (coming soon)"
+            aria-label="Voice input (coming soon)"
+            data-testid="ai-voice-btn"
+            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-green-800 transition duration-200 ease-out hover:scale-105 hover:bg-green-200 hover:text-green-900 active:scale-95"
+          >
+            <Mic className="h-6 w-6" strokeWidth={2} aria-hidden />
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
           </button>
           <button
             type="button"
@@ -416,4 +520,8 @@ export function AIScreen() {
       </div>
     </div>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3

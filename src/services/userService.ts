@@ -45,13 +45,21 @@ export async function createUserProfile(uid: string, payload: SignUpPayload): Pr
   }
   try {
     await setDoc(ref, data)
+<<<<<<< HEAD
     console.info('[KrishiMitra][Firestore][users] Document created', {
+=======
+    console.info('[AgriSathi][Firestore][users] Document created', {
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
       path: `${USERS}/${uid}`,
       uid,
       email: payload.email,
     })
   } catch (e) {
+<<<<<<< HEAD
     console.error('[KrishiMitra][Firestore][users] Failed to create document', { uid, error: e })
+=======
+    console.error('[AgriSathi][Firestore][users] Failed to create document', { uid, error: e })
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
     throw e
   }
 }

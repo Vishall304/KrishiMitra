@@ -12,7 +12,11 @@ from datetime import datetime
 from pathlib import Path
 
 class KrishiAPITester:
+<<<<<<< HEAD
     def __init__(self, base_url="https://crops-ai-voice.preview.emergentagent.com"):
+=======
+    def __init__(self, base_url="https://crop-detect-demo.preview.emergentagent.com"):
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
         self.base_url = base_url
         self.session = requests.Session()
         self.tests_run = 0

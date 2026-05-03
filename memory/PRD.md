@@ -47,7 +47,11 @@
 - Hindi / Marathi / English AI replies
 - Graceful fallback when AI provider is unreachable
 
+<<<<<<< HEAD
 ## What's been implemented (as of 2026-04-24)
+=======
+## What's been implemented (as of 2026-04-21)
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
 ### Iteration 1 — Wire-up & audit
 - Cloned repo into `/app`, bridged Vite to supervisor via `/app/frontend/package.json` shim (port 3000).
@@ -72,6 +76,7 @@
 - `yarn build` passes (Vercel-ready).
 - Verified 7/7 backend pytest pass; real LLM replies in en/hi/mr on the live preview.
 
+<<<<<<< HEAD
 ### Iteration 3 (polish) — Feed, voice, weather-aware AI
 - **Home feed expanded** to 12 diverse dummy posts across 8 kinds: `news`, `scheme`, `tips`, `market`, `weather`, `irrigation`, `fertilizer`, `pest`. Added horizontal category filter chips and swapped nested scroll for natural page-level scroll. New `FeedItem` type + icon map with `TrendingUp / CloudRain / Droplet / Sprout / Bug` lucide icons.
 - **Real voice input** via `useSpeechRecognition` hook wrapping the browser Web Speech API. Works on Chromium / Edge / most mobile browsers without any API key. Language hint follows the farmer's preferred language (`hi-IN` / `mr-IN` / `en-IN`). Idle / listening / error / unsupported states surfaced via the mic button (pill becomes red + pulses while listening). Graceful unsupported state (button disabled, helpful tooltip) — no crashes on Safari desktop.
@@ -81,6 +86,11 @@
 ### Testing status (iteration_4)
 - **Backend**: 7/7 pytest pass.
 - **Frontend**: 100% pass on the polish iteration — home feed, filters, voice button, weather injection, Hindi reply, no regressions.
+=======
+### Testing status
+- **Backend (`/api/ai/chat`, `/api/`, `/api/weather`)**: 100% pytest pass.
+- **Frontend**: auth + session + nav + home + AI real-LLM flow + typing indicator + multi-language all verified live.
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
 
 ## Known blockers (external — not code)
 - 🔶 **Firestore rules on project `krishix-eaccb` still deny `activities`, `reminders`, `cropDetections`, `chatHistory`** until the user runs `firebase deploy --only firestore:rules,firestore:indexes,storage`. The rules file is already authored and correct.

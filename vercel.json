@@ -7,4 +7,7 @@
     { "source": "/api/ai/chat", "destination": "/api/chat" }
   ]
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3

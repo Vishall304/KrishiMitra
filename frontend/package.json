@@ -5,4 +5,8 @@
   "scripts": {
     "start": "cd .. && yarn dev --host 0.0.0.0 --port 3000"
   }
+<<<<<<< HEAD
 } 
+=======
+}
+>>>>>>> f23ad11e638ed9dd75ca892b2f7fcb91e47d09b3
